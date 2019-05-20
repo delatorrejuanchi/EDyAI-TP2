@@ -1,6 +1,8 @@
 #include "slist.h"
 #include <assert.h>
+#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 SList slist_crear() { return NULL; }
 
