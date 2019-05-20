@@ -91,7 +91,7 @@ typedef struct {
 
 TablaHash* tablahash_crear(unsigned int capacidad, FuncionHash hash) {
   TablaHash* tabla = malloc(sizeof(TablaHash));
-  tabla->tabla = malloc(sizeof(SList*) * capacidad);
+  tabla->tabla = malloc(sizeof(SList) * capacidad);
   for (int i = 0; i < capacidad; i++) {
     tabla->tabla[i] = slist_crear();
   }
@@ -197,6 +197,45 @@ SList agregar_sugerencia(SList sugerencias, char* sugerencia) {
   return slist_agregar_inicio(sugerencias, palabra);
 }
 
+// TODO: no checkear la misma palabra longitud veces xd
+// Cambiando una letra
+void cambiar_letra(TablaHash tabla, SList lista, char* palabra) {
+  int longitud = strlen(palabra);
+  for (int i = 0; i < longitud; i++) {
+    char original = palabra[i];
+    for (int c = 'a'; c <= 'z'; c++) {
+      palabra[i] = c;
+      if (tablahash_buscar(tabla, palabra)) {
+        lista = agregar_sugerencia(lista, palabra);
+      }
+    }
+    palabra[i] = original;
+  }
+}
+
+// TODO: no agrega al inicio
+// Agregando una letra
+void agregar_letra(TablaHash tabla, SList lista, char* palabra) {
+  int longitud = strlen(palabra);
+  for (int i = longitud; i > 0; i--) {
+    palabra[i + 1] = palabra[i];
+  }
+  for (int i = 1; i < longitud + 1; i++) {
+    for (int c = 'a'; c <= 'z'; c++) {
+      palabra[i] = c; 
+      printf("->%s\n", palabra);
+      if (tablahash_buscar(tabla, palabra)) {
+        char* sugerencia = malloc(sizeof(char) * (strlen(palabra) + 1));
+        strcpy(sugerencia, palabra);
+
+        sugerencias = slist_agregar_inicio(sugerencias, sugerencia);
+      }
+    }
+    palabra[i] = palabra[i + 1];
+  }
+  palabra[longitud] = '\0';
+}
+
 int main(int argc, char* argv[]) {
   if (argc != 3) {
     printf("Error: el número de argumentos ingresados es incorrecto.\n");
@@ -247,43 +286,11 @@ int main(int argc, char* argv[]) {
     int correcta = tablahash_buscar(tabla, palabra);
     getrusage(RUSAGE_SELF, &after);
     printf("Tiempo para buscar: %f\n", calculate(&before, &after));
-    if (correcta == 0) {
+    if (!correcta) {
       printf("\"%s\" no está en el diccionario.\n", palabra);
       SList sugerencias = slist_crear();
 
       int longitud = strlen(palabra);
-
-      // TODO: no checkear la misma palabra longitud veces xd
-      // Cambiando una letra
-      for (int i = 0; i < longitud; i++) {
-        char original = palabra[i];
-        for (int c = 'a'; c <= 'z'; c++) {
-          palabra[i] = c;
-          if (tablahash_buscar(tabla, palabra)) {
-            sugerencias = agregar_sugerencia(sugerencias, palabra);
-          }
-        }
-        palabra[i] = original;
-      }
-
-      // TODO: no agrega al inicio
-      // Agregando una letra
-      for (int i = longitud; i > 0; i--) {
-        palabra[i + 1] = palabra[i];
-      }
-      for (int i = 1; i < longitud + 1; i++) {
-        for (int c = 'a'; c <= 'z'; c++) {
-          palabra[i] = c;
-          if (tablahash_buscar(tabla, palabra)) {
-            char* sugerencia = malloc(sizeof(char) * (strlen(palabra) + 1));
-            strcpy(sugerencia, palabra);
-
-            sugerencias = slist_agregar_inicio(sugerencias, sugerencia);
-          }
-        }
-        palabra[i] = palabra[i + 1];
-      }
-      palabra[longitud] = '\0';
 
       // Eliminando un caracter
       char eliminado = palabra[0];
