@@ -68,7 +68,7 @@ void generar_sugerencias(TablaHash* tabla, char* palabra) {
             sugerencias = agregar_sugerencia(sugerencias, palabra);
           }
 
-          // cola_encolar()
+          // cola_encolar();
         }
       }
       palabra[i] = original;
