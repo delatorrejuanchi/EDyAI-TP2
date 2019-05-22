@@ -54909,7 +54909,6 @@ Cáncer
 Cástor
 César
 D
-D.D.T
 Daimiel
 Damocles
 David
@@ -54993,7 +54992,6 @@ Juanelo
 Judea
 Júpiter
 K
-K.
 L
 La
 Labrador
@@ -55039,7 +55037,6 @@ Neptuno
 Ni
 Noé
 O
-O.
 Oceánidas
 Olimpo
 Os
@@ -55109,7 +55106,6 @@ Seltz
 Si
 Sirio
 T
-T.N.T.
 Ta
 Tauro
 Te

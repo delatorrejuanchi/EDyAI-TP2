@@ -50,6 +50,32 @@ SList agregar_sugerencia(SList sugerencias, char* sugerencia) {
   }
 }
 
+void generar_sugerencias(TablaHash* tabla, char* palabra) {
+  SList sugerencias = slist_crear();
+
+  // Cola cola_de_operaciones = cola_crear();
+
+  do {
+    // nodo = cola_desencolar(cola_de_operaciones);
+    int longitud = strlen(palabra);
+
+    for (int i = 0; i < longitud; i++) {
+      char original = palabra[i];
+      for (int c = 'a'; c <= 'z'; c++) {
+        if (c != original) {
+          palabra[i] = c;
+          if (tablahash_contiene(tabla, palabra)) {
+            sugerencias = agregar_sugerencia(sugerencias, palabra);
+          }
+
+          // cola_encolar()
+        }
+      }
+      palabra[i] = original;
+    }
+  } while (slist_longitud(sugerencias) < 5);
+}
+
 int main(int argc, char* argv[]) {
   if (argc != 3) {
     printf("Error: el número de argumentos ingresados es incorrecto.\n");
@@ -59,7 +85,7 @@ int main(int argc, char* argv[]) {
 
   TablaHash* tabla = tablahash_crear(TAMANO_TABLAHASH, hash);
   // TODO: preguntar como determinar un buen tamaño. Se que tiene que ser primo.
-  // TODO: debemos inicializar a NULL cada SList dentro de tabla->tabla?
+  // TODO: mejorar funcion hash
 
   int cargada = cargar_tabla(tabla, argv[1]);
   if (!cargada) {
@@ -68,11 +94,19 @@ int main(int argc, char* argv[]) {
     return 1;
   }
 
-  // FILE* out = fopen("out.txt", "w+");
-  // for (int i = 0; i < TAMANO_TABLAHASH; i++) {
-  //   fprintf(out, "%d %d\n", i, slist_longitud(tabla->tabla[i]));
-  // }
-  // fclose(out);
+  FILE* out = fopen("out.txt", "w+");
+  for (int i = 0; i < TAMANO_TABLAHASH; i++) {
+    fprintf(out, "%d %d\n", i, slist_longitud(tabla->tabla[i]));
+  }
+  fclose(out);
+
+  char palabra[50];
+  while (strcmp(palabra, "exit")) {
+    scanf("%s", palabra);
+
+    if (!tablahash_contiene(tabla, palabra))
+      generar_sugerencias(tabla, palabra);
+  }
 
   // char palabra[50];
   // while (strcmp(palabra, "exit") != 0) {

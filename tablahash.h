@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include "slist.h"
 
-#define TAMANO_TABLAHASH 1499
+#define TAMANO_TABLAHASH 5000
 
 // Una FuncionHash recibe una cadena y devuelve un entero positivo.
 // Este tipo de funcion es pasado como argumento en la funcion tablahash_crear
