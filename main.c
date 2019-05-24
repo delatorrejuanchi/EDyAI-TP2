@@ -1,112 +1,69 @@
 #include <ctype.h>
+#include <locale.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "slist.h"
-#include "tablahash.h"
-
-unsigned int hash(char* dato) {
-  int suma = 0;
-  for (int i = 0; i < strlen(dato); i++) {
-    suma += dato[i];
-  }
-
-  return suma;
-}
-
-int cargar_tabla(TablaHash* tabla, char* archivo) {
-  FILE* diccionario = fopen(archivo, "r");
-
-  if (diccionario == NULL) {
-    return 0;
-  }
-
-  char buffer[50];  // TODO: que tamaño uso para las palabras?
-  while (fscanf(diccionario, "%s", buffer) != EOF) {  // TODO: repeticiones?
-    char* palabra = malloc(sizeof(char) * (strlen(buffer) + 1));
-
-    // TODO: pasamos a lowercase?
-    for (int i = 0; i < strlen(buffer); i++) {
-      buffer[i] = tolower(buffer[i]);
-    }
-    strcpy(palabra, buffer);
-
-    tablahash_insertar(tabla, palabra);
-  }
-
-  fclose(diccionario);
-
-  return 1;
-}
-
-SList agregar_sugerencia(SList sugerencias, char* sugerencia) {
-  char* palabra = malloc(sizeof(char) * (strlen(sugerencia) + 1));
-  strcpy(palabra, sugerencia);
-
-  if (slist_contiene(sugerencias, palabra)) {
-    return sugerencias;
-  } else {
-    return slist_agregar_inicio(sugerencias, palabra);
-  }
-}
-
-void generar_sugerencias(TablaHash* tabla, char* palabra) {
-  SList sugerencias = slist_crear();
-
-  // Cola cola_de_operaciones = cola_crear();
-
-  do {
-    // nodo = cola_desencolar(cola_de_operaciones);
-    int longitud = strlen(palabra);
-
-    for (int i = 0; i < longitud; i++) {
-      char original = palabra[i];
-      for (int c = 'a'; c <= 'z'; c++) {
-        if (c != original) {
-          palabra[i] = c;
-          if (tablahash_contiene(tabla, palabra)) {
-            sugerencias = agregar_sugerencia(sugerencias, palabra);
-          }
-
-          // cola_encolar();
-        }
-      }
-      palabra[i] = original;
-    }
-  } while (slist_longitud(sugerencias) < 5);
-}
+#include "tree.h"
 
 int main(int argc, char* argv[]) {
-  if (argc != 3) {
-    printf("Error: el número de argumentos ingresados es incorrecto.\n");
-    printf("Modo de uso: %s [diccionario.txt] [texto.txt]", argv[0]);
-    return 1;
+  // setlocale(LC_ALL, "es");
+
+  // char cadena[3];
+  // cadena[0] = -61;
+  // cadena[2] = '\0';
+  // for (int i = -127; i < 0; i++) {
+  //   cadena[1] = i;
+  //   printf("%s %d\n", cadena, i);
+  // }
+
+  Tree* tree = tree_crear();
+
+  char buffer[50];
+  scanf("%s", buffer);
+  while (strcmp(buffer, ".")) {
+    tree_agregar(tree, buffer);
+    scanf("%s", buffer);
   }
 
-  TablaHash* tabla = tablahash_crear(TAMANO_TABLAHASH, hash);
+  scanf("%s", buffer);
+  while (strcmp(buffer, ".")) {
+    printf("%d\n", tree_contiene(tree, buffer));
+    scanf("%s", buffer);
+  }
+
+  tree_destruir(tree);
+
+  // if (argc != 3) {
+  //   printf("Error: el número de argumentos ingresados es incorrecto.\n");
+  //   printf("Modo de uso: %s [diccionario.txt] [texto.txt]", argv[0]);
+  //   return 1;
+  // }
+
+  // TablaHash* tabla = tablahash_crear(TAMANO_TABLAHASH, hash);
   // TODO: preguntar como determinar un buen tamaño. Se que tiene que ser primo.
   // TODO: mejorar funcion hash
 
-  int cargada = cargar_tabla(tabla, argv[1]);
-  if (!cargada) {
-    printf("Error: el archivo %s no existe.\n", argv[1]);
-    tablahash_destruir(tabla);
-    return 1;
-  }
+  // int cargada = cargar_tabla(tabla, argv[1]);
+  // if (!cargada) {
+  //   printf("Error: el archivo %s no existe.\n", argv[1]);
+  //   tablahash_destruir(tabla);
+  //   return 1;
+  // }
 
-  FILE* out = fopen("out.txt", "w+");
-  for (int i = 0; i < TAMANO_TABLAHASH; i++) {
-    fprintf(out, "%d %d\n", i, slist_longitud(tabla->tabla[i]));
-  }
-  fclose(out);
+  // FILE* out = fopen("out.txt", "w+");
+  // for (int i = 0; i < TAMANO_TABLAHASH; i++) {
+  //   fprintf(out, "%d %d\n", i, slist_longitud(tabla->tabla[i]));
+  // }
+  // fclose(out);
 
-  char palabra[50];
-  while (strcmp(palabra, "exit")) {
-    scanf("%s", palabra);
+  // char palabra[50];
+  // while (strcmp(palabra, "exit")) {
+  //   scanf("%s", palabra);
 
-    if (!tablahash_contiene(tabla, palabra))
-      generar_sugerencias(tabla, palabra);
-  }
+  //   if (!tablahash_contiene(tabla, palabra))
+  //     generar_sugerencias(tabla, palabra);
+  // }
 
   // char palabra[50];
   // while (strcmp(palabra, "exit") != 0) {
@@ -193,7 +150,7 @@ int main(int argc, char* argv[]) {
   //   }
   // }
 
-  tablahash_destruir(tabla);
+  // tablahash_destruir(tabla);
 
   return 0;
 }

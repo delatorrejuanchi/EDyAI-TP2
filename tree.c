@@ -1,56 +1,100 @@
 #include "tree.h"
 #include <assert.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
-// #define STOP 0
-
-Tree tree_crear() {
-  Tree tree = malloc(sizeof(Tree));
-  tree->funcion = caracter_a_indice;
-  tree->hijos = NULL;
+int funcion_alfabeto(char caracter) {
+  int indice = -1;
+  if ('a' <= caracter && caracter <= 'z')
+    indice = caracter - 97;
+  else {
+    switch ((int)caracter) {
+      case -95:
+        indice = 26;
+        break;
+      case -87:
+        indice = 27;
+        break;
+      case -83:
+        indice = 28;
+        break;
+      case -77:
+        indice = 29;
+        break;
+      case -70:
+        indice = 30;
+        break;
+      case -68:
+        indice = 31;
+        break;
+      case -79:
+        indice = 32;
+        break;
+    }
+  }
+  return indice;
 }
 
-int tree_es_vacio(Tree tree) {
-  return tree->hijos == NULL;
+Tree* tree_crear() {
+  Tree* tree = malloc(sizeof(TNodo));
+  tree->origen = tnodo_crear();
+
+  return tree;
 }
 
-// TODO: Que es mejor assert o if si hay que ver si esta vacia
-// TODO: Ver si esta bien
-void tree_destruir(Tree tree) {
-  assert(!tree_es_vacio(tree));
-  tree_destruir(tree->hijos);
+// int tree_vacio(Tree* tree) { return tree->origen == NULL; }
+
+TNodo* tnodo_crear() {
+  TNodo* tnodo = malloc(sizeof(TNodo));
+  tnodo->termina = 0;
+  // tnodo->maxProfundidad = 0;
+  for (int i = 0; i < TAMANO_ALFABETO; i++) {
+    tnodo->hijos[i] = NULL;
+  }
+
+  return tnodo;
+}
+
+void tree_destruir(Tree* tree) {
+  tnodo_destruir(tree->origen);
   free(tree);
 }
 
-int tree_contiene_cadena(Tree tree, char* cadena) {
-  if (!tree_es_vacio(tree)) {
-    int longitud = strlen(cadena), found = 0;
-    TNodo *nodo = tree->hijos;
-
-    for (int i = 0; i < longitud && nodo != NULL  && !found; i++) {
-      int letra = tree->funcion(cadena[i]);
-
-      if (!nodo->letras[letra]->termina) nodo = nodo->letras[letra];
-
-      else found = 1;
+void tnodo_destruir(TNodo* tnodo) {
+  if (tnodo != NULL) {
+    for (int i = 0; i < TAMANO_ALFABETO; i++) {
+      tnodo_destruir(tnodo->hijos[i]);
     }
 
-    return found;
+    free(tnodo);
   }
 }
 
-// TODO: Recorro 2 veces el tree
-void tree_insertar(Tree tree, char* cadena) {
-    TNodo *nodo = tree->hijos;
-    int longitud = 0;
+int tree_contiene(Tree* tree, char* palabra) {
+  int longitud = strlen(palabra);
 
-    for (int i = 0; i < longitud; i++) {
-      int letra = tree->funcion(cadena[i]);
-      nodo->termina = 0;
-      nodo = nodo->letras[letra];
+  TNodo* nodo = tree->origen;
+  for (int i = 0; i < longitud && nodo != NULL; i++) {
+    int indice = funcion_alfabeto(palabra[i]);
+    if (indice != -1) nodo = nodo->hijos[indice];
+  }
+
+  return nodo != NULL && nodo->termina;
+}
+
+void tree_agregar(Tree* tree, char* palabra) {
+  int longitud = strlen(palabra);
+
+  TNodo* nodo = tree->origen;
+  for (int i = 0; i < longitud; i++) {
+    int indice = funcion_alfabeto(palabra[i]);
+    if (indice != -1) {
+      if (nodo->hijos[indice] == NULL) {
+        nodo->hijos[indice] = tnodo_crear();
+      }
+
+      nodo = nodo->hijos[indice];
     }
+  }
 
-    nodo->termina = 1;
+  nodo->termina = 1;
 }
