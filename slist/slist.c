@@ -22,7 +22,7 @@ SList slist_eliminar_inicio(SList slist, FDestructora destruir_dato) {
   SNodo* nodoAEliminar = slist;
   slist = slist->sig;
 
-  destruir_dato(slist->dato);
+  destruir_dato(nodoAEliminar->dato);
   free(nodoAEliminar);
 
   return slist;

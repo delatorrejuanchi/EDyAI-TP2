@@ -6,11 +6,9 @@
 #include "../util.h"
 
 // TODO:
-// - verdadera strlen
-// - struct { TNodo* nodo; Stack<TNodo*> ancestros; int i;}
-// - cola para encolar esta struct
-// - stack para apilar padres
-
+// - renombrar: TNodo*->termina
+//              Caracter
+//              Estructura
 typedef struct {
   char caracter;
 } Caracter;
@@ -31,100 +29,19 @@ Estructura* estructura_crear(TNodo* nodo, SPila ancestros, int i) {
 }
 
 Caracter* caracter_crear(char c) {
-  Caracter* caracter = malloc(sizeof(caracter));
+  Caracter* caracter = malloc(sizeof(Caracter));
   caracter->caracter = c;
 
   return caracter;
 }
 
-int caracter_a_indice(char caracter) {
-  int indice = -1;
-  if ('a' <= caracter && caracter <= 'z')
-    indice = caracter - 97;
-  else {
-    switch ((int)caracter) {
-      case -95:
-        indice = 26;
-        break;
-      case -87:
-        indice = 27;
-        break;
-      case -83:
-        indice = 28;
-        break;
-      case -77:
-        indice = 29;
-        break;
-      case -70:
-        indice = 30;
-        break;
-      case -68:
-        indice = 31;
-        break;
-      case -79:
-        indice = 32;
-        break;
-    }
-  }
-  return indice;
-}
-
-char indice_a_caracter(int indice) {
-  char caracter = ' ';
-  if (0 <= indice && indice <= 25)
-    caracter = indice + 97;
-  else {
-    switch (indice) {
-      case 26:
-        caracter = -95;
-        break;
-      case 27:
-        caracter = -87;
-        break;
-      case 28:
-        caracter = -83;
-        break;
-      case 29:
-        caracter = -77;
-        break;
-      case 30:
-        caracter = -70;
-        break;
-      case 31:
-        caracter = -68;
-        break;
-      case 32:
-        caracter = -79;
-        break;
-    }
-  }
-
-  return caracter;
-}
-
-// SList palabra_a_slist(char* palabra) {
-//   SList slist = slist_crear();
-
-//   SNodo* nodo = slist;
-//   for (int i = 0; i < strlen(palabra); i++) {
-//     int indice = caracter_a_indice(palabra);
-//     if (indice != -1) {
-//       SNodo* nuevoNodo = slist_agregar_inicio(NULL, indice);
-//       if (slist_vacia(slist))
-//         nodo = nuevoNodo;
-//       else {
-//         nodo->sig = nuevoNodo;
-//         nodo = nuevoNodo;
-//       }
-//     }
-//   }
-// }
-
 TNodo* tnodo_crear() {
   TNodo* tnodo = malloc(sizeof(TNodo));
   tnodo->padre = NULL;
   tnodo->termina = 0;
+  tnodo->identificador = -1;
   // tnodo->maxProfundidad = 0;
+
   for (int i = 0; i < TAMANO_ALFABETO; i++) {
     tnodo->hijos[i] = NULL;
   }
@@ -167,26 +84,6 @@ int tree_contiene(Tree* tree, char* palabra) {
   return tnodo_buscar(tree->origen, palabra, 0);
 }
 
-// void tree_agregar(Tree* tree, char* palabra) {
-//   TNodo* nodo = tree->origen;
-//   SList slist = palabra_a_slist(palabra);
-
-//   for (int i = 0; i < strlen(palabra); i++) {
-//     int indice = caracter_a_indice(palabra[i]);
-//     if (indice != -1) {
-//       if (nodo->hijos[indice] == NULL) {
-//         nodo->hijos[indice] = tnodo_crear();
-//         nodo->hijos[indice]->padre = nodo;
-//         nodo->hijos[indice]->identificador = indice;
-//       }
-
-//       nodo = nodo->hijos[indice];
-//     }
-//   }
-
-//   nodo->termina = 1;
-// }
-
 void tree_agregar(Tree* tree, char* palabra) {
   TNodo* nodo = tree->origen;
   for (int i = 0; i < strlen(palabra); i++) {
@@ -205,48 +102,43 @@ void tree_agregar(Tree* tree, char* palabra) {
   nodo->termina = 1;
 }
 
-char* generar_sugerencia(SPila ancestros, TNodo* nodo, char* palabra, int i) {
-  SPila caracteres = spila_crear();
-  int longitudPrefijo = 0, longitudSufijo = strlen(palabra) - i;
-
+// TODO: Renombrar
+void caracteres_agregar(TNodo* nodo, SPila* caracteres) {
   TNodo* nodoActual = nodo;
-  while (nodoActual != NULL) {
+  while (nodoActual->padre != NULL) {
     int indice = nodoActual->identificador;
     Caracter* caracter = caracter_crear(indice_a_caracter(indice));
-    caracteres = spila_push(caracteres, caracter);
-    longitudPrefijo++;
-    if (indice < 0) {
+    *caracteres = spila_push(*caracteres, caracter);
+    if (indice >= 26) {
       Caracter* especial = caracter_crear(-61);
-      caracteres = spila_push(caracteres, especial);
-      longitudPrefijo++;
+      *caracteres = spila_push(*caracteres, especial);
     }
     nodoActual = nodoActual->padre;
   }
+}
+
+char* resconstruir(SPila ancestros, TNodo* nodo, char* palabra, int i) {
+  if (nodo == NULL)
+    printf("WTF?!\n");
+  else
+    printf("%d-i:%d %d\n", nodo->identificador, i,
+           nodo->padre->padre->identificador);
+  SPila caracteres = spila_crear();
+
+  caracteres_agregar(nodo, &caracteres);
 
   SNodo* ancestro = ancestros;
+  TNodo* nodoActual;
   while (ancestro != NULL) {
     nodoActual = ancestro->dato;
-    while (nodoActual != NULL) {
-      int indice = nodoActual->identificador;
-      Caracter* caracter = caracter_crear(indice_a_caracter(indice));
-      caracteres = spila_push(caracteres, caracter);
-      longitudPrefijo++;
-      if (indice < 0) {
-        Caracter* especial = caracter_crear(-61);
-        caracteres = spila_push(caracteres, especial);
-        longitudPrefijo++;
-      }
-      nodoActual = nodoActual->padre;
-    }
-
     Caracter* espacio = caracter_crear(' ');
     caracteres = spila_push(caracteres, espacio);
-    longitudPrefijo++;
+    caracteres_agregar(nodoActual, &caracteres);
     ancestro = ancestro->sig;
   }
 
-  char* sugerencia =
-      malloc(sizeof(char) * (longitudPrefijo + longitudSufijo + 1));
+  int prefijo = slist_longitud(caracteres), sufijo = strlen(palabra) - i;
+  char* sugerencia = malloc(sizeof(char) * (prefijo + sufijo + 1));
 
   int c = 0;
   while (!spila_vacia(caracteres)) {
@@ -265,6 +157,40 @@ char* generar_sugerencia(SPila ancestros, TNodo* nodo, char* palabra, int i) {
   return sugerencia;
 }
 
+void imprimir_estructura(void* dato) {
+  Estructura* estructura = dato;
+  SPila caracteres = spila_crear();
+  if (estructura->nodo == NULL) {
+    printf("END\n");
+    return;
+  }
+
+  caracteres_agregar(estructura->nodo, &caracteres);
+
+  // SNodo* ancestro = estructura->ancestros;
+  // TNodo* nodoActual;
+  // while (ancestro != NULL) {
+  //   nodoActual = ancestro->dato;
+  //   Caracter* espacio = caracter_crear(' ');
+  //   caracteres = spila_push(caracteres, espacio);
+  //   caracteres_agregar(nodoActual, &caracteres);
+  //   ancestro = ancestro->sig;
+  // }
+
+  char palabra[100];
+
+  int c = 0;
+  while (!spila_vacia(caracteres)) {
+    palabra[c] = ((Caracter*)spila_top(caracteres))->caracter;
+    caracteres = spila_pop(caracteres, destruir_generico);
+    c++;
+  }
+
+  palabra[c] = '\0';
+
+  printf("--> %s\n", palabra);
+}
+
 SList tree_sugerir(Tree* tree, char* palabra) {
   int longitud = strlen(palabra);
 
@@ -277,34 +203,36 @@ SList tree_sugerir(Tree* tree, char* palabra) {
   // cola = cdcola_desencolar(cola, destruir_generico);
   // cola = cdcola_desencolar(cola, destruir_generico);
 
-  while (slist_longitud(sugerencias) == 0 && !cdcola_vacia(cola)) {
+  while (slist_longitud(sugerencias) <= 2 && !cdcola_vacia(cola)) {
     Estructura* estructura = cdcola_primero(cola);
-    TNodo* nodo = estructura->nodo;
+    TNodo* nodoBase = estructura->nodo;
     SPila ancestros = estructura->ancestros;
     int i = estructura->i;
     cola = cdcola_desencolar(cola, destruir_generico);
 
     // Agregar letra
-    TNodo* nodoActual = nodo;
-    for (int nivel = 0; nivel <= longitud - i && nodoActual != NULL; nivel++) {
-      int indice = caracter_a_indice(palabra[nivel + i]);
-      if (indice != -1) {
+    TNodo* nodo = nodoBase;
+    for (int j = 0; j <= longitud - i && nodo != NULL; j++) {
+      int indice = caracter_a_indice(palabra[j + i]);
+      if (indice != -1 || j == longitud - i) {
         for (int c = 0; c < TAMANO_ALFABETO; c++) {
-          // if (tnodo_buscar(nodoActual->hijos[c], palabra, nivel)) {
-          // agregar a sugerencias
-          // char* sugerencia =
-          //     generar_sugerencia(ancestros, nodoActual, palabra, nivel);
-          // sugerencias = slist_agregar_inicio(sugerencias, sugerencia);
-          // }
+          if (tnodo_buscar(nodo->hijos[c], palabra, i + j)) {
+            char* sugerencia =
+                resconstruir(ancestros, nodo->hijos[c], palabra, j);
+            printf("%s\n", sugerencia);
+            sugerencias = slist_agregar_inicio(sugerencias, sugerencia);
+          }
 
-          estructura =
-              estructura_crear(nodoActual->hijos[c], ancestros, nivel + i);
-          cola = cdcola_encolar(cola, estructura);
+          if (nodo != NULL) {
+            estructura = estructura_crear(nodo->hijos[c], ancestros, i + j);
+            cola = cdcola_encolar(cola, estructura);
+          }
         }
-
-        nodoActual = nodoActual->hijos[indice];
+        nodo = nodo->hijos[indice];
       }
     }
+
+    // cdcola_recorrer(cola, imprimir_estructura);
 
     // Eliminar letra
     // nodoActual = nodo;

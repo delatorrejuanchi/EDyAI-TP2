@@ -33886,7 +33886,6 @@ errar
 errata
 erre
 erreal
-erro
 errona
 error
 errático
