@@ -30,20 +30,21 @@ int main(int argc, char* argv[]) {
   }
 
   Tree* tree = tree_crear();
-  // if (cargar_diccionario(tree, argv[1])) {
-  //   printf("Diccionario %s cargado exitosamente.\n", argv[1]);
-  // } else {
-  //   printf("Se ha producido un error al cargar el diccionario %s\n.", argv[1]);
-  // }
-
-  char b[50];
-  while (strcmp(b, ".")) {
-    scanf("%s", b);
-    // printf("%d\n", tree_contiene(tree, buffer));
-    char* palabra = malloc(sizeof(char) * (strlen(b) + 1));
-    strcpy(palabra, b);
-    tree_agregar(tree, palabra);
+  if (cargar_diccionario(tree, argv[1])) {
+    printf("Diccionario %s cargado exitosamente.\n", argv[1]);
+  } else {
+    printf("Se ha producido un error al cargar el diccionario %s\n.", argv[1]);
   }
+
+  // char b[50];
+  // scanf("%s", b);
+  // while (strcmp(b, ".")) {
+  //   // printf("%d\n", tree_contiene(tree, buffer));
+  //   char* palabra = malloc(sizeof(char) * (strlen(b) + 1));
+  //   strcpy(palabra, b);
+  //   tree_agregar(tree, palabra);
+  //   scanf("%s", b);
+  // }
 
   char buffer[50];
   do {
@@ -55,6 +56,7 @@ int main(int argc, char* argv[]) {
     } else {
       printf("Quizás quiso decir:\n");
       SList sugerencias = tree_sugerir(tree, buffer);
+      printf("%d\n", slist_longitud(sugerencias));
       slist_destruir(sugerencias, destruir_generico);
     }
   } while (strcmp(buffer, "."));
