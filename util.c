@@ -1,5 +1,6 @@
 #include "util.h"
 #include <stdlib.h>
+#include <string.h>
 
 void destruir_generico(void* dato) { free(dato); }
 
