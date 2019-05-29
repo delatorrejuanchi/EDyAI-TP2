@@ -1,5 +1,7 @@
-#if !defined(__CDCOLA__)
-#define __CDCOLA__
+#if !defined(__CDCOLA_H_)
+#define __CDCOLA_H_
+
+// TODO: documentar
 
 #include "../cdlist/cdlist.h"
 #include "../util.h"
@@ -20,4 +22,4 @@ void cdcola_destruir(CDCola cdcola, FDestructora destruir_dato);
 
 void cdcola_recorrer(CDCola cdcola, FVisitante visitar);
 
-#endif  // __CDCOLA__
+#endif  // __CDCOLA_H__

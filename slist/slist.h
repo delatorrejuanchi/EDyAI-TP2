@@ -1,5 +1,7 @@
-#if !defined(__SLIST__)
-#define __SLIST__
+#if !defined(__SLIST_H__)
+#define __SLIST_H__
+
+// TODO: corregir documentacion
 
 #include "../util.h"
 
@@ -56,4 +58,4 @@ int slist_longitud(SList slist);
 // Devuelve 1 si la lista contiene a la cadena, 0 en caso contrario.
 // int slist_contiene(SList slist, void* dato);
 
-#endif  // __SLIST__
+#endif  // __SLIST_H__

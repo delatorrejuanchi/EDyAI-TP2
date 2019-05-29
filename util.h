@@ -11,7 +11,7 @@
 typedef void (*FDestructora)(void*);
 
 // Una FVisitante es una función que recibe un puntero a un dato y hace algo con
-// él (por ejemplo, lo muestra en pantalla). Es usada como argumento de varias
+// él (por ejemplo, lo muestra en pantalla). Es usada como argumento a varias
 // funciones en las que se recorre una estructura de datos, como por ejemplo:
 // - slist_recorrer
 // - cdlist_recorrer
@@ -19,7 +19,14 @@ typedef void (*FDestructora)(void*);
 // - cdcola_recorrer
 typedef void (*FVisitante)(void*);
 
-// TODO: documentar
+// Una FVisitanteExtra es una función que recibe un puntero a un dato y un
+// puntero a un dato extra, y utiliza el primer dato para modificar el valor del
+// dato extra. Es usada como argumento a varias funciones en las que se recorre
+// una estructura de datos, como por ejemplo:
+// - slist_recorrer_extra
+// - cdlist_recorrer_extra TODO: implementar
+// - spila_recorrer_extra
+// - cdcola_recorrer_extra TODO: implementar
 typedef void (*FVisitanteExtra)(void*, void*);
 
 // no_destruir: void* -> void
@@ -35,6 +42,25 @@ void no_destruir(void* dato);
 // Esta función es de tipo FDestructora. Es utilizada cuando free(dato) basta
 // para eliminar correctamente el dato.
 void destruir_generico(void* dato);
+
+// TODO: considerar extraer a arreglo/arreglo.h, con un dato generico, de manera
+// que se le puedan implementar recorrer, recorrer_extra y destruir. En ese caso
+// agregar referencias arriba a la nueva estructura.
+// TODO: documentar
+typedef struct {
+  char** datos;
+  int nElems;
+  int tamano;
+} Arreglo;
+
+// TODO: documentar
+Arreglo* arreglo_crear(int tamano);
+
+// TODO: documentar
+int arreglo_anadir(Arreglo* arreglo, char* palabra);
+
+// TODO: documentar
+void arreglo_destruir(Arreglo* arreglo);
 
 // Definimos la siguiente estructura Caracter para usar en una SPila de
 // caracteres.

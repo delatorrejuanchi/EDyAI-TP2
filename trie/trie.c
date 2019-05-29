@@ -72,38 +72,6 @@ int trie_contiene(Trie* trie, char* palabra) {
 }
 
 // TODO: cambiar tamanos a int
-// TODO: arreglo_destruir
-
-Arreglo* arreglo_crear(int tamano) {
-  Arreglo* arreglo = malloc(sizeof(Arreglo));
-  arreglo->datos = malloc(sizeof(char*) * tamano);
-  for (int i = 0; i < tamano; i++) arreglo->datos[i] = NULL;
-  arreglo->tamano = tamano;
-  arreglo->nElems = 0;
-
-  return arreglo;
-}
-
-int arreglo_anadir(Arreglo* arreglo, char* palabra) {
-  if (arreglo->nElems == arreglo->tamano) return 0;
-  int i = 0;
-  while (i < arreglo->nElems && strcmp(arreglo->datos[i], palabra)) i++;
-  if (i == arreglo->nElems) {
-    arreglo->datos[i] = palabra;
-    arreglo->nElems++;
-    return 1;
-  } else
-    return 0;
-}
-
-void arreglo_destruir(Arreglo* arreglo) {
-  for (int i = 0; i < arreglo->nElems; i++) {
-    free(arreglo->datos[i]);
-  }
-
-  free(arreglo->datos);
-  free(arreglo);
-}
 
 Arreglo* trie_sugerir(Trie* trie, char* palabra, int cantidadSugerencias) {
   Arreglo* sugerencias = arreglo_crear(cantidadSugerencias);
@@ -119,27 +87,6 @@ Arreglo* trie_sugerir(Trie* trie, char* palabra, int cantidadSugerencias) {
     __eliminar_letras(palabra, estructura, &cola, sugerencias);
 
     cola = cdcola_desencolar(cola, destruir_generico);
-
-    // Eliminar letra
-    // nodo = nodoBase;
-    // for (int j = 0; j < longitud - i && nodo != NULL; j++) {
-    //   int indice = caracter_a_indice(palabra[i + j]);
-    //   if (indice != -1) {
-    //     if (indice != caracter_a_indice(palabra[i + j + 1])) {
-    //       if (tnodo_buscar(nodo, palabra, i + j + 1)) {
-    //         char* sugerencia =
-    //             __reconstruir(ancestros, nodo, palabra, j + i + 1);
-
-    //         if (!arreglo_anadir(sugerencias, sugerencia)) free(sugerencia);
-    //       }
-
-    //       estructura = estructura_crear(nodo, ancestros, i + j + 1);
-    //       cola = cdcola_encolar(cola, estructura);
-    //     }
-
-    //     nodo = nodo->hijos[indice];
-    //   }
-    // }
 
     // nodoActual = nodo;
     // for (int nivel = 0; nivel < longitud - i; nivel++) {
@@ -246,6 +193,7 @@ char* __reconstruir(SPila anteriores, TNodo* nodoActual, char* palabra, int i) {
   return sugerencia;
 }
 
+// TODO: hacer menos feo
 void __agregar_letras(char* palabra, Estructura* estructura, CDCola* cola,
                       Arreglo* sugerencias) {
   int longitud = strlen(palabra);
@@ -276,6 +224,7 @@ void __agregar_letras(char* palabra, Estructura* estructura, CDCola* cola,
   }
 }
 
+// TODO: hacer menos feo
 void __eliminar_letras(char* palabra, Estructura* estructura, CDCola* cola,
                        Arreglo* sugerencias) {
   int longitud = strlen(palabra);

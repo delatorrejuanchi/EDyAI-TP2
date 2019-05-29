@@ -52,10 +52,3 @@ int slist_longitud(SList slist) {
 
   return longitud;
 }
-
-// int slist_contiene(SList slist, char* dato) {
-//   SNodo* nodo = slist;
-//   while (nodo != NULL && strcmp(nodo->dato, dato) != 0) nodo = nodo->sig;
-
-//   return nodo != NULL;
-// }

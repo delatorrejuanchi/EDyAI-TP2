@@ -1,5 +1,6 @@
 #if !defined(__TRIE_H__)
 #define __TRIE_H__
+
 #include "../cdcola/cdcola.h"
 #include "../slist/slist.h"
 #include "../spila/spila.h"
@@ -39,34 +40,20 @@ typedef struct _TNodo {
   struct _TNodo* hijos[TAMANO_ALFABETO];
   int identificador;
   int termina;
-  // TODO: int maxProfundidad;
+  // int maxProfundidad; TODO: implementar
 } TNodo;
 
 typedef struct {
   TNodo* origen;
 } Trie;
 
+// TODO: renombrar
 // TODO: documentar
 typedef struct {
   TNodo* nodo;
   SPila anteriores;
   int i;
 } Estructura;
-
-typedef struct {
-  char** datos;
-  int nElems;
-  int tamano;
-} Arreglo;
-
-// TODO: documentar
-Arreglo* arreglo_crear(int tamano);
-
-// TODO: documentar
-int arreglo_anadir(Arreglo* arreglo, char* palabra);
-
-// TODO: documentar
-void arreglo_destruir(Arreglo* arreglo);
 
 // tnodo_crear: -> TNodo*
 // Crea un TNodo con padre == NULL, identificador == -1 y termina == 0,
@@ -105,13 +92,15 @@ int trie_contiene(Trie* trie, char* palabra);
 // realizar,
 // Busca sugerencias para la palabra mediante combinaciones de las siguientes
 // operaciones:
+// TODO: tratar de reducir la cantidad de checkeos repetitivos, evaluar paso a
+// paso a ver como hacerlo
 // - Agregar una letra
 // - Eliminar una letra
 // - Cambiar una letra
 // - Intercambiar caracteres adyacentes
 // - Agregar espacios
 // Prioriza como sugerencias aquellas que son conseguidas utilizando la menor
-// cantidad de alteraciones posibles. TODO: y si usamos una priority queue?
+// cantidad de alteraciones posibles. TODO: vale la pena usar una PCola?
 // Devuelve un puntero a un Arreglo con cantidadSugerencias palabras.
 Arreglo* trie_sugerir(Trie* trie, char* palabra, int cantidadSugerencias);
 
@@ -129,7 +118,9 @@ void __apilar_padres(TNodo* tnodo, SPila* caracteres);
 
 // __reconstruir_anterior: void* void* -> void
 // Recibe un puntero a un dato (TNodo) y un puntero a un dato extra (SPila),
-// TODO: completar
+// Apila un caracter ' ' a la SPila, y luego llama __apilar_padres sobre el
+// TNodo* recibido.
+// Esta función es de tipo FVisitanteExtra.
 void __reconstruir_anterior(void* dato, void* extra);
 
 // __reconstruir: SPila TNodo* char* int -> char*
@@ -146,10 +137,22 @@ void __reconstruir_anterior(void* dato, void* extra);
 //   [anterior_n] [anterior_n-1] ... [anterior_1] [prefijo][sufijo]
 char* __reconstruir(SPila anteriores, TNodo* nodoActual, char* palabra, int i);
 
-// TODO: documentar
+// __agregar_letras: char* Estructura* CDCola* Arreglo* -> void
+// Recibe una palabra, un puntero a una Estructura, un puntero a una CDCola y un
+// puntero a un Arreglo,
+// Prueba agregando letras desde la posición (estructura->i)-ésima de la palabra
+// en adelante. Si encuentra una palabra válida, la agrega al Arreglo de
+// sugerencias.
+// Para cada nuevaLetra que trata de agregar, si
+// (estructura->nodo)->hijos[nuevaLetra] != NULL, encola a la CDCola una nueva
+// estructura con los siguientes datos:
+// - nodo == (estructura->nodo)->hijos[nuevaLetra]
+// - anteriores == estructura->anteriores
+// - i == "indice en donde se agregó la letra"
 void __agregar_letras(char* palabra, Estructura* estructura, CDCola* cola,
                       Arreglo* sugerencias);
 
+// __eliminar_letras: char* Estructura* CDCola* Arreglo* -> void
 // TODO: documentar
 void __eliminar_letras(char* palabra, Estructura* estructura, CDCola* cola,
                        Arreglo* sugerencias);

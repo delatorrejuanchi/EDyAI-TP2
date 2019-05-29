@@ -5,6 +5,37 @@ void destruir_generico(void* dato) { free(dato); }
 
 void no_destruir(void* dato) {}
 
+Arreglo* arreglo_crear(int tamano) {
+  Arreglo* arreglo = malloc(sizeof(Arreglo));
+  arreglo->datos = malloc(sizeof(char*) * tamano);
+  for (int i = 0; i < tamano; i++) arreglo->datos[i] = NULL;
+  arreglo->tamano = tamano;
+  arreglo->nElems = 0;
+
+  return arreglo;
+}
+
+int arreglo_anadir(Arreglo* arreglo, char* palabra) {
+  if (arreglo->nElems == arreglo->tamano) return 0;
+  int i = 0;
+  while (i < arreglo->nElems && strcmp(arreglo->datos[i], palabra)) i++;
+  if (i == arreglo->nElems) {
+    arreglo->datos[i] = palabra;
+    arreglo->nElems++;
+    return 1;
+  } else
+    return 0;
+}
+
+void arreglo_destruir(Arreglo* arreglo) {
+  for (int i = 0; i < arreglo->nElems; i++) {
+    free(arreglo->datos[i]);
+  }
+
+  free(arreglo->datos);
+  free(arreglo);
+}
+
 Caracter* caracter_crear(char c) {
   Caracter* caracter = malloc(sizeof(Caracter));
   caracter->caracter = c;

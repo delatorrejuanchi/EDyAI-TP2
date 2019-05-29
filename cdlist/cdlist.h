@@ -1,5 +1,7 @@
-#ifndef __CDLIST__
-#define __CDLIST__
+#if !defined(__CDLIST_H__)
+#define __CDLIST_H__
+
+// TODO: documentar
 
 #include "../util.h"
 
@@ -25,4 +27,4 @@ void cdlist_destruir(CDList cdlist, FDestructora destruir_dato);
 
 void cdlist_recorrer(CDList cdlist, FVisitante visitar);
 
-#endif /*__CDLIST__ */
+#endif  // __CDLIST_H__

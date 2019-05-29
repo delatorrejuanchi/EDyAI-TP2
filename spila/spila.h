@@ -1,5 +1,7 @@
-#ifndef __SPILA__
-#define __SPILA__
+#if !defined(__SPILA_H__)
+#define __SPILA_H__
+
+// TODO: documentar
 
 #include "../slist/slist.h"
 #include "../util.h"
@@ -22,4 +24,4 @@ void spila_recorrer(SPila spila, FVisitante visitar);
 
 void spila_recorrer_extra(SPila spila, FVisitanteExtra visitar, void* extra);
 
-#endif /* __SPILA__ */
+#endif  // __SPILA_H_
