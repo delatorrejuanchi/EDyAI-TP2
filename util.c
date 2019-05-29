@@ -2,7 +2,15 @@
 #include <stdlib.h>
 
 void destruir_generico(void* dato) { free(dato); }
+
 void no_destruir(void* dato) {}
+
+Caracter* caracter_crear(char c) {
+  Caracter* caracter = malloc(sizeof(Caracter));
+  caracter->caracter = c;
+
+  return caracter;
+}
 
 int caracter_a_indice(char caracter) {
   int indice = -1;

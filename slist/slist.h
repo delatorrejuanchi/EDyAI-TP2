@@ -43,6 +43,9 @@ void slist_destruir(SList slist, FDestructora destruir_dato);
 // La imprime.
 void slist_recorrer(SList slist, FVisitante visitar);
 
+// TODO: documentar
+void slist_recorrer_extra(SList slist, FVisitanteExtra visitar, void* extra);
+
 // slist_longitud: SList -> int
 // Recibe una lista,
 // Devuelve su longitud.

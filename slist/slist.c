@@ -36,7 +36,13 @@ void slist_destruir(SList slist, FDestructora destruir_dato) {
 
 void slist_recorrer(SList slist, FVisitante visitar) {
   for (SNodo* nodo = slist; nodo != NULL; nodo = nodo->sig) {
-    visitar(nodo);
+    visitar(nodo->dato);
+  }
+}
+
+void slist_recorrer_extra(SList slist, FVisitanteExtra visitar, void* extra) {
+  for (SNodo* nodo = slist; nodo != NULL; nodo = nodo->sig) {
+    visitar(nodo, &extra);
   }
 }
 

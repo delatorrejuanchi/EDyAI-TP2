@@ -1,21 +1,23 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
-#include "tree/tree.h"
+#include "trie/trie.h"
 
-// TODO: tratar de reducir encolamientos redundantes
+// Representa la cantidad de sugerencias a generar por cada
+// palabra incorrecta encontrada.
+#define CANTIDAD_SUGERENCIAS 5
 
-int cargar_diccionario(Tree* tree, char* nombreDeArchivo) {
+// cargar_diccionario: Trie* char* -> int
+// Recibe un puntero a un Trie y un el nombre de archivo de un diccionario,
+// Si el archivo existe, agrega todas las palabras al Trie, y devuelve 1.
+// Si no, devuelve 0.
+int cargar_diccionario(Trie* trie, char* nombreDeArchivo) {
   FILE* archivo = fopen(nombreDeArchivo, "r");
 
   if (archivo == NULL) return 0;
 
   char buffer[100];
-  while (fscanf(archivo, "%s", buffer) != EOF) {
-    char* palabra = malloc(sizeof(char) * (strlen(buffer) + 1));
-    strcpy(palabra, buffer);
-
-    tree_agregar(tree, palabra);
-  }
+  while (fscanf(archivo, "%s", buffer) != EOF) trie_agregar(trie, buffer);
 
   fclose(archivo);
 
@@ -29,39 +31,46 @@ int main(int argc, char* argv[]) {
     return 1;
   }
 
-  Tree* tree = tree_crear();
-  if (cargar_diccionario(tree, argv[1])) {
-    printf("Diccionario %s cargado exitosamente.\n", argv[1]);
+  Trie* trie = trie_crear();
+  char b[50];
+  printf("Activar modo debug? ");
+  scanf("%s", b);
+  if (strcmp(b, "si") != 0) {
+    if (cargar_diccionario(trie, argv[1])) {
+      printf("Diccionario %s cargado exitosamente.\n", argv[1]);
+    } else {
+      printf("Se ha producido un error cargando el diccionario %s\n.", argv[1]);
+    }
   } else {
-    printf("Se ha producido un error al cargar el diccionario %s\n.", argv[1]);
+    printf("Inserte el diccionario:\n");
+    scanf("%s", b);
+    while (strcmp(b, ".")) {
+      trie_agregar(trie, b);
+      scanf("%s", b);
+    }
   }
 
-  // char b[50];
-  // scanf("%s", b);
-  // while (strcmp(b, ".")) {
-  //   // printf("%d\n", tree_contiene(tree, buffer));
-  //   char* palabra = malloc(sizeof(char) * (strlen(b) + 1));
-  //   strcpy(palabra, b);
-  //   tree_agregar(tree, palabra);
-  //   scanf("%s", b);
-  // }
-
   char buffer[50];
-  do {
-    printf("Buscar palabra:> ");
-    scanf("%s", buffer);
-    // printf("%d\n", tree_contiene(tree, buffer));
-    if (tree_contiene(tree, buffer)) {
+  printf("Buscar palabra: ");
+  scanf("%s", buffer);
+  while (strcmp(buffer, ".")) {
+    if (trie_contiene(trie, buffer)) {
       printf("Palabra encontrada!\n");
     } else {
-      printf("Quizás quiso decir:\n");
-      SList sugerencias = tree_sugerir(tree, buffer);
-      printf("%d\n", slist_longitud(sugerencias));
-      slist_destruir(sugerencias, destruir_generico);
+      printf("\"%s\" no está en el diccionario.\n", buffer);
+      Arreglo* sugerencias = trie_sugerir(trie, buffer, CANTIDAD_SUGERENCIAS);
+      printf("Quizás quiso decir:");
+      for (int i = 0; i < CANTIDAD_SUGERENCIAS; i++)
+        printf(" %s", sugerencias->datos[i]);
+      printf("\n");
+      arreglo_destruir(sugerencias);
     }
-  } while (strcmp(buffer, "."));
 
-  tree_destruir(tree);
+    printf("Buscar palabra: ");
+    scanf("%s", buffer);
+  };
+
+  trie_destruir(trie);
 
   return 0;
 }

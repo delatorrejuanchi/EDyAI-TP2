@@ -20,4 +20,6 @@ void spila_destruir(SPila spila, FDestructora destruir_dato);
 
 void spila_recorrer(SPila spila, FVisitante visitar);
 
+void spila_recorrer_extra(SPila spila, FVisitanteExtra visitar, void* extra);
+
 #endif /* __SPILA__ */
