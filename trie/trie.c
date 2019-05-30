@@ -5,6 +5,8 @@
 #include <string.h>
 #include "../spila/spila.h"
 
+// TODO: perrogato -> perro gato a ?
+
 Estructura* estructura_crear(TNodo* tnodo, SPila anteriores, int i) {
   Estructura* estructura = malloc(sizeof(Estructura));
   estructura->nodo = tnodo;
@@ -12,6 +14,15 @@ Estructura* estructura_crear(TNodo* tnodo, SPila anteriores, int i) {
   estructura->i = i;
 
   return estructura;
+}
+
+// TODO: documentar
+void destruir_estructura(void* dato) {
+  Estructura* estructura = dato;
+  if (estructura->anteriores != NULL)
+    spila_destruir(estructura->anteriores, no_destruir);
+
+  free(dato);
 }
 
 TNodo* tnodo_crear() {
@@ -71,8 +82,6 @@ int trie_contiene(Trie* trie, char* palabra) {
   return tnodo_buscar(trie->origen, palabra, 0);
 }
 
-// TODO: cambiar tamanos a int
-
 Arreglo* trie_sugerir(Trie* trie, char* palabra, int cantidadSugerencias) {
   Arreglo* sugerencias = arreglo_crear(cantidadSugerencias);
 
@@ -83,65 +92,16 @@ Arreglo* trie_sugerir(Trie* trie, char* palabra, int cantidadSugerencias) {
   while (sugerencias->nElems < cantidadSugerencias && !cdcola_vacia(cola)) {
     Estructura* estructura = cdcola_primero(cola);
 
-    __agregar_letras(palabra, estructura, &cola, sugerencias);
-    __eliminar_letras(palabra, estructura, &cola, sugerencias);
+    // __intercambiar_letras(palabra, estructura, &cola, sugerencias);
+    // __agregar_letras(palabra, estructura, &cola, sugerencias);
+    // __eliminar_letras(palabra, estructura, &cola, sugerencias);
+    // __transponer_letras(palabra, estructura, &cola, sugerencias);
+    __separar_palabras(palabra, estructura, &cola, sugerencias, trie->origen);
 
     cola = cdcola_desencolar(cola, destruir_generico);
-
-    // nodoActual = nodo;
-    // for (int nivel = 0; nivel < longitud - i; nivel++) {
-    //   int indice = caracter_a_indice(palabra[nivel + i + 1]);
-
-    //   if (tnodo_buscar(nodoActual->hijos[indice], palabra, nivel + i +
-    //   1)) {
-    //     // agregar a sugerencias
-    //   }
-
-    //   cola = cdcola_encolar(cola,
-    //                         2);  // struct nodo=nodo->hijos[indice],
-    //   i = nivel + i +
-    //       1
-
-    //       indice = caracter_a_indice(palabra[i + nivel]);
-    //   nodoActual = nodoActual->hijos[indice];
-    // }
-
-    // // Cambiar letra
-    // TNodo* nodoActual = nodo;
-    // for (int nivel = 0; nivel < longitud(palabra) - i; nivel++) {
-    //   for (int c = 0; c < TAMANO_ALFABETO; c++) {
-    //     if (tnodo_buscar(nodoActual->hijos[c], palabra, nivel + i + 1)) {
-    //       // agregar a sugerencias
-    //     }
-
-    //     cola = cdcola_encolar(cola, 1);
-    //     // struct nodo=nodo->hijos[c], i=nivel+i+1
-    //   }
-
-    //   int indice = caracter_a_indice(palabra[i + nivel]);
-    //   nodoActual = nodoActual->hijos[indice];
-    // }
-
-    // // Agrregar espacios
-    // TNodo* nodoActual = nodo;
-    // for (int nivel = 0; nivel <= longitud(palabra) - i; nivel++) {
-    //   if (nodoActual->termina && tnodo_buscar(trie->origen, palabra, i +
-    //   1))
-    //   {
-    //     // agregar a sugerencias
-    //   }
-
-    //   cola = cdcola_encolar(cola, 1);  // struct nodo=trie->origen,
-    //   i = nivel + i + 1,
-    //   // padres=padres+nodoActual
-
-    //       int indice = caracter_a_indice(palabra[i + nivel]);
-    //   nodoActual = nodoActual->hijos[indice];
-    // }
   }
 
-  cdlist_destruir(cola, destruir_generico);  // TODO: cuando usemos ancestros,
-                                             // hay que hacerles free.
+  cdlist_destruir(cola, destruir_estructura);
 
   return sugerencias;
 }
@@ -193,7 +153,6 @@ char* __reconstruir(SPila anteriores, TNodo* nodoActual, char* palabra, int i) {
   return sugerencia;
 }
 
-// TODO: hacer menos feo
 void __agregar_letras(char* palabra, Estructura* estructura, CDCola* cola,
                       Arreglo* sugerencias) {
   int longitud = strlen(palabra);
@@ -201,30 +160,33 @@ void __agregar_letras(char* palabra, Estructura* estructura, CDCola* cola,
   SPila anteriores = estructura->anteriores;
   int i = estructura->i;
 
-  for (int j = 0; j <= longitud - i && nodo != NULL; j++) {
+  int seguir = nodo != NULL && sugerencias->nElems < sugerencias->tamano;
+  for (int j = 0; j <= longitud - i && seguir; j++) {
     int indice = caracter_a_indice(palabra[j + i]);
-    if (indice != -1 || j == longitud - i) {
-      for (int c = 0; c < TAMANO_ALFABETO; c++) {
-        if (c != indice) {
-          if (tnodo_buscar(nodo->hijos[c], palabra, i + j)) {
-            char* sugerencia =
-                __reconstruir(anteriores, nodo->hijos[c], palabra, j + i);
 
-            if (!arreglo_anadir(sugerencias, sugerencia)) free(sugerencia);
-          }
+    int c = 0;
+    while (c < TAMANO_ALFABETO && (indice != -1 || j == longitud - i)) {
+      if (c != indice) {
+        if (tnodo_buscar(nodo->hijos[c], palabra, i + j)) {
+          char* sugerencia =
+              __reconstruir(anteriores, nodo->hijos[c], palabra, j + i);
 
-          if (nodo->hijos[c] != NULL) {
-            estructura = estructura_crear(nodo->hijos[c], anteriores, i + j);
-            *cola = cdcola_encolar(*cola, estructura);
-          }
+          if (!arreglo_anadir(sugerencias, sugerencia)) free(sugerencia);
+        }
+
+        if (nodo->hijos[c] != NULL) {
+          estructura = estructura_crear(nodo->hijos[c], anteriores, i + j);
+          *cola = cdcola_encolar(*cola, estructura);
         }
       }
-      nodo = nodo->hijos[indice];
+      c++;
     }
+
+    if (indice != -1) nodo = nodo->hijos[indice];
+    seguir = nodo != NULL && sugerencias->nElems < sugerencias->tamano;
   }
 }
 
-// TODO: hacer menos feo
 void __eliminar_letras(char* palabra, Estructura* estructura, CDCola* cola,
                        Arreglo* sugerencias) {
   int longitud = strlen(palabra);
@@ -232,23 +194,118 @@ void __eliminar_letras(char* palabra, Estructura* estructura, CDCola* cola,
   SPila anteriores = estructura->anteriores;
   int i = estructura->i;
 
-  for (int j = 0; j < longitud - i && nodo != NULL; j++) {
+  int seguir = nodo != NULL && sugerencias->nElems < sugerencias->tamano;
+  for (int j = 0; j < longitud - i && seguir; j++) {
     int indice = caracter_a_indice(palabra[i + j]);
-    if (indice != -1) {
-      if (indice != caracter_a_indice(palabra[i + j + 1]) ||
-          nodo->hijos[i + j + 1] == NULL) {
-        if (tnodo_buscar(nodo, palabra, i + j + 1)) {
+    int indiceSig = caracter_a_indice(palabra[i + j + 1]);
+
+    int intentar = indice != indiceSig || nodo->hijos[indiceSig] == NULL;
+    if (indice != -1 && intentar) {
+      if (tnodo_buscar(nodo, palabra, i + j + 1)) {
+        char* sugerencia = __reconstruir(anteriores, nodo, palabra, j + i + 1);
+        if (!arreglo_anadir(sugerencias, sugerencia)) free(sugerencia);
+      }
+
+      estructura = estructura_crear(nodo, anteriores, i + j + 1);
+      *cola = cdcola_encolar(*cola, estructura);
+    }
+
+    if (indice != -1) nodo = nodo->hijos[indice];
+    seguir = nodo != NULL && sugerencias->nElems < sugerencias->tamano;
+  }
+}
+
+void __intercambiar_letras(char* palabra, Estructura* estructura, CDCola* cola,
+                           Arreglo* sugerencias) {
+  int longitud = strlen(palabra);
+  TNodo* nodo = estructura->nodo;
+  SPila anteriores = estructura->anteriores;
+  int i = estructura->i;
+
+  int seguir = nodo != NULL && sugerencias->nElems < sugerencias->tamano;
+  for (int j = 0; j < longitud - i && seguir; j++) {
+    int indice = caracter_a_indice(palabra[j + i]);
+
+    int c = 0;
+    while (c < TAMANO_ALFABETO && indice != -1) {
+      if (c != indice) {
+        if (tnodo_buscar(nodo->hijos[c], palabra, i + j + 1)) {
           char* sugerencia =
-              __reconstruir(anteriores, nodo, palabra, j + i + 1);
+              __reconstruir(anteriores, nodo->hijos[c], palabra, j + i + 1);
 
           if (!arreglo_anadir(sugerencias, sugerencia)) free(sugerencia);
         }
 
-        estructura = estructura_crear(nodo, anteriores, i + j + 1);
-        *cola = cdcola_encolar(*cola, estructura);
+        if (nodo->hijos[c] != NULL) {
+          estructura = estructura_crear(nodo->hijos[c], anteriores, i + j + 1);
+          *cola = cdcola_encolar(*cola, estructura);
+        }
       }
 
-      nodo = nodo->hijos[indice];
+      c++;
     }
+
+    if (indice != -1) nodo = nodo->hijos[indice];
+    seguir = nodo != NULL && sugerencias->nElems < sugerencias->tamano;
+  }
+}
+
+void __transponer_letras(char* palabra, Estructura* estructura, CDCola* cola,
+                         Arreglo* sugerencias) {
+  int longitud = strlen(palabra);
+  TNodo* nodo = estructura->nodo;
+  SPila anteriores = estructura->anteriores;
+  int i = estructura->i;
+
+  int seguir = nodo != NULL && sugerencias->nElems < sugerencias->tamano;
+  for (int j = 0; j < longitud - i - 1 && seguir; j++) {
+    int pos = i + j + 1;
+    if (caracter_a_indice(palabra[pos]) == -1 && pos < longitud) pos++;
+
+    int indice = caracter_a_indice(palabra[i + j]);
+    int indiceSig = caracter_a_indice(palabra[pos]);
+    if (indice != -1 && indiceSig != -1 && nodo->hijos[indiceSig] != NULL &&
+        nodo->hijos[indiceSig]->hijos[indice] != NULL) {
+      TNodo* auxiliar = nodo->hijos[indiceSig]->hijos[indice];
+      if (tnodo_buscar(auxiliar, palabra, i + j + 2)) {
+        char* sugerencia =
+            __reconstruir(anteriores, auxiliar, palabra, j + i + 2);
+        if (!arreglo_anadir(sugerencias, sugerencia)) free(sugerencia);
+      }
+
+      estructura = estructura_crear(auxiliar, anteriores, i + j + 2);
+      *cola = cdcola_encolar(*cola, estructura);
+    }
+
+    if (indice != -1) nodo = nodo->hijos[indice];
+    seguir = nodo != NULL && sugerencias->nElems < sugerencias->tamano;
+  }
+}
+
+void __separar_palabras(char* palabra, Estructura* estructura, CDCola* cola,
+                        Arreglo* sugerencias, TNodo* origen) {
+  int longitud = strlen(palabra);
+  TNodo* nodo = estructura->nodo;
+  SPila anteriores = estructura->anteriores;
+  int i = estructura->i;
+
+  int seguir = nodo != NULL && sugerencias->nElems < sugerencias->tamano;
+  for (int j = 0; j < longitud - i && seguir; j++) {
+    int indice = caracter_a_indice(palabra[i + j]);
+    if (indice != -1 && nodo->hijos[indice] != NULL &&
+        nodo->hijos[indice]->termina) {
+      anteriores = spila_push(anteriores, nodo->hijos[indice]);
+      if (tnodo_buscar(origen, palabra, i + j + 1)) {
+        char* sugerencia =
+            __reconstruir(anteriores, origen, palabra, j + i + 1);
+        if (!arreglo_anadir(sugerencias, sugerencia)) free(sugerencia);
+      }
+
+      estructura = estructura_crear(origen, anteriores, i + j + 1);
+      *cola = cdcola_encolar(*cola, estructura);
+    }
+
+    if (indice != -1) nodo = nodo->hijos[indice];
+    seguir = nodo != NULL && sugerencias->nElems < sugerencias->tamano;
   }
 }

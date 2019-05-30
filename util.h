@@ -115,4 +115,6 @@ int caracter_a_indice(char caracter);
 //   ser representado correctamente.
 char indice_a_caracter(int indice);
 
+void quizas_destruir(void* dato);
+
 #endif  // __UTIL_H_

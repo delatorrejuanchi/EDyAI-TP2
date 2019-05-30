@@ -157,4 +157,12 @@ void __agregar_letras(char* palabra, Estructura* estructura, CDCola* cola,
 void __eliminar_letras(char* palabra, Estructura* estructura, CDCola* cola,
                        Arreglo* sugerencias);
 
+void __intercambiar_letras(char* palabra, Estructura* estructura, CDCola* cola,
+                           Arreglo* sugerencias);
+
+void __transponer_letras(char* palabra, Estructura* estructura, CDCola* cola,
+                         Arreglo* sugerencias);
+
+void __separar_palabras(char* palabra, Estructura* estructura, CDCola* cola,
+                        Arreglo* sugerencias, TNodo* origen);
 #endif  // __TRIE_H__

@@ -42,7 +42,7 @@ void slist_recorrer(SList slist, FVisitante visitar) {
 
 void slist_recorrer_extra(SList slist, FVisitanteExtra visitar, void* extra) {
   for (SNodo* nodo = slist; nodo != NULL; nodo = nodo->sig) {
-    visitar(nodo, &extra);
+    visitar(nodo->dato, extra);
   }
 }
 

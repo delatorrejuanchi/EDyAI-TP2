@@ -111,3 +111,7 @@ char indice_a_caracter(int indice) {
 
   return caracter;
 }
+
+void quizas_destruir(void* dato) {
+  if (dato != NULL) free(dato);
+}

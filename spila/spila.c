@@ -30,5 +30,5 @@ void spila_recorrer(SPila spila, FVisitante visitar) {
 }
 
 void spila_recorrer_extra(SPila spila, FVisitanteExtra visitar, void* extra) {
-  slist_recorrer_extra(spila, visitar, &extra);
+  slist_recorrer_extra(spila, visitar, extra);
 }
