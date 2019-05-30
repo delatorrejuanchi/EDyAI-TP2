@@ -57,8 +57,8 @@ void cdlist_destruir(CDList cdlist, FDestructora destruir_dato) {
       free(tmp);
     }
 
-    destruir_dato(cdlist->dato);
-    free(cdlist);
+    destruir_dato(nodoAEliminar->dato);
+    free(nodoAEliminar);
   }
 }
 
