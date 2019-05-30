@@ -27,4 +27,6 @@ void cdlist_destruir(CDList cdlist, FDestructora destruir_dato);
 
 void cdlist_recorrer(CDList cdlist, FVisitante visitar);
 
+// TODO: cdlist_recorrer_extra. tambien para cdcola
+
 #endif  // __CDLIST_H__

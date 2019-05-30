@@ -18,7 +18,6 @@ Estructura* estructura_crear(TNodo* tnodo, SPila anteriores, int i) {
 
 // TODO: documentar
 void destruir_estructura(void* dato) {
-  printf("Destruyendo %p\n", dato);
   Estructura* estructura = dato;
   if (estructura->anteriores != NULL)
     spila_destruir(estructura->anteriores, no_destruir);
@@ -99,7 +98,7 @@ Arreglo* trie_sugerir(Trie* trie, char* palabra, int cantidadSugerencias) {
     // __transponer_letras(palabra, estructura, &cola, sugerencias);
     __separar_palabras(palabra, estructura, &cola, sugerencias, trie->origen);
 
-    cola = cdcola_desencolar(cola, destruir_generico);
+    cola = cdcola_desencolar(cola, destruir_estructura);
   }
 
   cdlist_destruir(cola, destruir_estructura);
@@ -295,7 +294,8 @@ void __separar_palabras(char* palabra, Estructura* estructura, CDCola* cola,
     int indice = caracter_a_indice(palabra[i + j]);
     if (indice != -1 && nodo->hijos[indice] != NULL &&
         nodo->hijos[indice]->termina) {
-      SNodo* anterioresNuevo = spila_push(anteriores, nodo->hijos[indice]);
+      SPila anterioresNuevo = spila_duplicar(anteriores);
+      anterioresNuevo = spila_push(anterioresNuevo, nodo->hijos[indice]);
       if (tnodo_buscar(origen, palabra, i + j + 1)) {
         char* sugerencia =
             __reconstruir(anterioresNuevo, origen, palabra, j + i + 1);

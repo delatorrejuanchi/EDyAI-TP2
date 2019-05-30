@@ -52,3 +52,23 @@ int slist_longitud(SList slist) {
 
   return longitud;
 }
+
+SList slist_duplicar(SList slist) {
+  if (slist_vacia(slist)) return slist;
+
+  SList copia = malloc(sizeof(SNodo));
+
+  SNodo* nodo = copia;
+  SNodo* iter = slist;
+  while (iter->sig != NULL) {
+    nodo->dato = iter->dato;
+    nodo->sig = malloc(sizeof(SNodo));
+    nodo = nodo->sig;
+    iter = iter->sig;
+  }
+
+  nodo->dato = iter->dato;
+  nodo->sig = NULL;
+
+  return copia;
+}
