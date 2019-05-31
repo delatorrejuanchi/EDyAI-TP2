@@ -62,6 +62,9 @@ int arreglo_anadir(Arreglo* arreglo, char* palabra);
 // TODO: documentar
 void arreglo_destruir(Arreglo* arreglo);
 
+// TODO: docuentar
+int arreglo_lleno(Arreglo* arreglo);
+
 // Definimos la siguiente estructura Caracter para usar en una SPila de
 // caracteres.
 typedef struct {

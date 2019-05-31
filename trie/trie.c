@@ -75,7 +75,7 @@ void trie_agregar(Trie* trie, char* palabra) {
     }
   }
 
-  nodo->termina = 1;
+  if (nodo != trie->origen) nodo->termina = 1;
 }
 
 int trie_contiene(Trie* trie, char* palabra) {
@@ -85,23 +85,12 @@ int trie_contiene(Trie* trie, char* palabra) {
 Arreglo* trie_sugerir(Trie* trie, char* palabra, int cantidadSugerencias) {
   Arreglo* sugerencias = arreglo_crear(cantidadSugerencias);
 
-  // Inicializamos una cola de "estructura" jejexd TODO: renombrar
-  CDCola cola = cdcola_crear();
-  cola = cdcola_encolar(cola, estructura_crear(trie->origen, spila_crear(), 0));
-
-  while (sugerencias->nElems < cantidadSugerencias && !cdcola_vacia(cola)) {
-    Estructura* estructura = cdcola_primero(cola);
-
-    __intercambiar_letras(palabra, estructura, &cola, sugerencias);
-    __agregar_letras(palabra, estructura, &cola, sugerencias);
-    __eliminar_letras(palabra, estructura, &cola, sugerencias);
-    __transponer_letras(palabra, estructura, &cola, sugerencias);
-    __separar_palabras(palabra, estructura, &cola, sugerencias, trie->origen);
-
-    cola = cdcola_desencolar(cola, destruir_estructura);
+  int maxProfundidad = 0;
+  while (!arreglo_lleno(sugerencias)) {
+    maxProfundidad++;
+    __transformar(palabra, trie->origen, spila_crear(), 0, trie->origen,
+                  sugerencias, maxProfundidad);
   }
-
-  cdlist_destruir(cola, destruir_estructura);
 
   return sugerencias;
 }
@@ -109,6 +98,22 @@ Arreglo* trie_sugerir(Trie* trie, char* palabra, int cantidadSugerencias) {
 void trie_destruir(Trie* trie) {
   tnodo_destruir(trie->origen);
   free(trie);
+}
+
+void __transformar(char* palabra, TNodo* nodo, SPila anteriores, int i,
+                   TNodo* origen, Arreglo* sugerencias, int maxProfundidad) {
+  if (nodo == NULL || maxProfundidad == 0) return;
+
+  // __transponer_letras(palabra, nodo, anteriores, i, origen, sugerencias,
+  //                     maxProfundidad);
+  __agregar_letras(palabra, nodo, anteriores, i, origen, sugerencias,
+                   maxProfundidad);
+  __eliminar_letras(palabra, nodo, anteriores, i, origen, sugerencias,
+                    maxProfundidad);
+  __intercambiar_letras(palabra, nodo, anteriores, i, origen, sugerencias,
+                        maxProfundidad);
+  __separar_palabras(palabra, nodo, anteriores, i, origen, sugerencias,
+                     maxProfundidad);
 }
 
 void __apilar_padres(TNodo* tnodo, SPila* caracteres) {
@@ -153,14 +158,10 @@ char* __reconstruir(SPila anteriores, TNodo* nodoActual, char* palabra, int i) {
   return sugerencia;
 }
 
-void __agregar_letras(char* palabra, Estructura* estructura, CDCola* cola,
-                      Arreglo* sugerencias) {
+void __agregar_letras(char* palabra, TNodo* nodo, SPila anteriores, int i,
+                      TNodo* origen, Arreglo* sugerencias, int maxProfundidad) {
   int longitud = strlen(palabra);
-  TNodo* nodo = estructura->nodo;
-  SPila anteriores = estructura->anteriores;
-  int i = estructura->i;
-
-  int seguir = nodo != NULL && sugerencias->nElems < sugerencias->tamano;
+  int seguir = nodo != NULL && !arreglo_lleno(sugerencias);
   for (int j = 0; j <= longitud - i && seguir; j++) {
     int indice = caracter_a_indice(palabra[j + i]);
 
@@ -174,27 +175,22 @@ void __agregar_letras(char* palabra, Estructura* estructura, CDCola* cola,
           if (!arreglo_anadir(sugerencias, sugerencia)) free(sugerencia);
         }
 
-        if (nodo->hijos[c] != NULL) {
-          estructura = estructura_crear(nodo->hijos[c], anteriores, i + j);
-          *cola = cdcola_encolar(*cola, estructura);
-        }
+        __transformar(palabra, nodo->hijos[c], anteriores, i + j, origen,
+                      sugerencias, maxProfundidad - 1);
       }
       c++;
     }
 
     if (indice != -1) nodo = nodo->hijos[indice];
-    seguir = nodo != NULL && sugerencias->nElems < sugerencias->tamano;
+    seguir = nodo != NULL && !arreglo_lleno(sugerencias);
   }
 }
 
-void __eliminar_letras(char* palabra, Estructura* estructura, CDCola* cola,
-                       Arreglo* sugerencias) {
+void __eliminar_letras(char* palabra, TNodo* nodo, SPila anteriores, int i,
+                       TNodo* origen, Arreglo* sugerencias,
+                       int maxProfundidad) {
   int longitud = strlen(palabra);
-  TNodo* nodo = estructura->nodo;
-  SPila anteriores = estructura->anteriores;
-  int i = estructura->i;
-
-  int seguir = nodo != NULL && sugerencias->nElems < sugerencias->tamano;
+  int seguir = nodo != NULL && !arreglo_lleno(sugerencias);
   for (int j = 0; j < longitud - i && seguir; j++) {
     int indice = caracter_a_indice(palabra[i + j]);
     int indiceSig = caracter_a_indice(palabra[i + j + 1]);
@@ -206,23 +202,21 @@ void __eliminar_letras(char* palabra, Estructura* estructura, CDCola* cola,
         if (!arreglo_anadir(sugerencias, sugerencia)) free(sugerencia);
       }
 
-      estructura = estructura_crear(nodo, anteriores, i + j + 1);
-      *cola = cdcola_encolar(*cola, estructura);
+      __transformar(palabra, nodo, anteriores, i + j + 1, origen, sugerencias,
+                    maxProfundidad - 1);
     }
 
     if (indice != -1) nodo = nodo->hijos[indice];
-    seguir = nodo != NULL && sugerencias->nElems < sugerencias->tamano;
+    seguir = nodo != NULL && !arreglo_lleno(sugerencias);
   }
 }
 
-void __intercambiar_letras(char* palabra, Estructura* estructura, CDCola* cola,
-                           Arreglo* sugerencias) {
+void __intercambiar_letras(char* palabra, TNodo* nodo, SPila anteriores, int i,
+                           TNodo* origen, Arreglo* sugerencias,
+                           int maxProfundidad) {
   int longitud = strlen(palabra);
-  TNodo* nodo = estructura->nodo;
-  SPila anteriores = estructura->anteriores;
-  int i = estructura->i;
 
-  int seguir = nodo != NULL && sugerencias->nElems < sugerencias->tamano;
+  int seguir = nodo != NULL && !arreglo_lleno(sugerencias);
   for (int j = 0; j < longitud - i && seguir; j++) {
     int indice = caracter_a_indice(palabra[j + i]);
 
@@ -236,28 +230,24 @@ void __intercambiar_letras(char* palabra, Estructura* estructura, CDCola* cola,
           if (!arreglo_anadir(sugerencias, sugerencia)) free(sugerencia);
         }
 
-        if (nodo->hijos[c] != NULL) {
-          estructura = estructura_crear(nodo->hijos[c], anteriores, i + j + 1);
-          *cola = cdcola_encolar(*cola, estructura);
-        }
+        __transformar(palabra, nodo->hijos[c], anteriores, i + j + 1, origen,
+                      sugerencias, maxProfundidad - 1);
       }
 
       c++;
     }
 
     if (indice != -1) nodo = nodo->hijos[indice];
-    seguir = nodo != NULL && sugerencias->nElems < sugerencias->tamano;
+    seguir = nodo != NULL && !arreglo_lleno(sugerencias);
   }
 }
 
-void __transponer_letras(char* palabra, Estructura* estructura, CDCola* cola,
-                         Arreglo* sugerencias) {
+void __transponer_letras(char* palabra, TNodo* nodo, SPila anteriores, int i,
+                         TNodo* origen, Arreglo* sugerencias,
+                         int maxProfundidad) {
   int longitud = strlen(palabra);
-  TNodo* nodo = estructura->nodo;
-  SPila anteriores = estructura->anteriores;
-  int i = estructura->i;
 
-  int seguir = nodo != NULL && sugerencias->nElems < sugerencias->tamano;
+  int seguir = nodo != NULL && !arreglo_lleno(sugerencias);
   for (int j = 0; j < longitud - i - 1 && seguir; j++) {
     int pos = i + j + 1;
     if (caracter_a_indice(palabra[pos]) == -1 && pos < longitud) pos++;
@@ -273,23 +263,21 @@ void __transponer_letras(char* palabra, Estructura* estructura, CDCola* cola,
         if (!arreglo_anadir(sugerencias, sugerencia)) free(sugerencia);
       }
 
-      estructura = estructura_crear(auxiliar, anteriores, i + j + 2);
-      *cola = cdcola_encolar(*cola, estructura);
+      __transformar(palabra, auxiliar, anteriores, i + j + 2, origen,
+                    sugerencias, maxProfundidad - 1);
     }
 
     if (indice != -1) nodo = nodo->hijos[indice];
-    seguir = nodo != NULL && sugerencias->nElems < sugerencias->tamano;
+    seguir = nodo != NULL && !arreglo_lleno(sugerencias);
   }
 }
 
-void __separar_palabras(char* palabra, Estructura* estructura, CDCola* cola,
-                        Arreglo* sugerencias, TNodo* origen) {
+void __separar_palabras(char* palabra, TNodo* nodo, SPila anteriores, int i,
+                        TNodo* origen, Arreglo* sugerencias,
+                        int maxProfundidad) {
   int longitud = strlen(palabra);
-  TNodo* nodo = estructura->nodo;
-  SPila anteriores = estructura->anteriores;
-  int i = estructura->i;
 
-  int seguir = nodo != NULL && sugerencias->nElems < sugerencias->tamano;
+  int seguir = nodo != NULL && !arreglo_lleno(sugerencias);
   for (int j = 0; j < longitud - i && seguir; j++) {
     int indice = caracter_a_indice(palabra[i + j]);
     if (indice != -1 && nodo->hijos[indice] != NULL &&
@@ -302,11 +290,12 @@ void __separar_palabras(char* palabra, Estructura* estructura, CDCola* cola,
         if (!arreglo_anadir(sugerencias, sugerencia)) free(sugerencia);
       }
 
-      estructura = estructura_crear(origen, anterioresNuevo, i + j + 1);
-      *cola = cdcola_encolar(*cola, estructura);
+      __transformar(palabra, origen, anterioresNuevo, i + j + 1, origen,
+                    sugerencias, maxProfundidad - 1);
+      spila_destruir(anterioresNuevo, no_destruir);
     }
 
     if (indice != -1) nodo = nodo->hijos[indice];
-    seguir = nodo != NULL && sugerencias->nElems < sugerencias->tamano;
+    seguir = nodo != NULL && !arreglo_lleno(sugerencias);
   }
 }

@@ -37,6 +37,10 @@ void arreglo_destruir(Arreglo* arreglo) {
   free(arreglo);
 }
 
+int arreglo_lleno(Arreglo* arreglo) {
+  return arreglo->nElems == arreglo->tamano;
+}
+
 Caracter* caracter_crear(char c) {
   Caracter* caracter = malloc(sizeof(Caracter));
   caracter->caracter = c;

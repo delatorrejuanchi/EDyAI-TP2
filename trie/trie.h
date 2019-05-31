@@ -149,20 +149,37 @@ char* __reconstruir(SPila anteriores, TNodo* nodoActual, char* palabra, int i);
 // - nodo == (estructura->nodo)->hijos[nuevaLetra]
 // - anteriores == estructura->anteriores
 // - i == "indice en donde se agregó la letra"
-void __agregar_letras(char* palabra, Estructura* estructura, CDCola* cola,
-                      Arreglo* sugerencias);
+// void __agregar_letras(char* palabra, Estructura* estructura, CDCola* cola,
+//                       Arreglo* sugerencias);
 
+void __transformar(char* palabra, TNodo* nodo, SPila anteriores, int i,
+                   TNodo* origen, Arreglo* sugerencias, int maxProfundidad);
+
+void __agregar_letras(char* palabra, TNodo* nodo, SPila anteriores, int i,
+                      TNodo* origen, Arreglo* sugerencias, int maxProfundidad);
 // __eliminar_letras: char* Estructura* CDCola* Arreglo* -> void
 // TODO: documentar
-void __eliminar_letras(char* palabra, Estructura* estructura, CDCola* cola,
-                       Arreglo* sugerencias);
+// void __eliminar_letras(char* palabra, Estructura* estructura, CDCola*
+// cola,
+//                        Arreglo* sugerencias);
+void __eliminar_letras(char* palabra, TNodo* nodo, SPila anteriores, int i,
+                       TNodo* origen, Arreglo* sugerencias, int maxProfundidad);
 
-void __intercambiar_letras(char* palabra, Estructura* estructura, CDCola* cola,
-                           Arreglo* sugerencias);
+void __intercambiar_letras(char* palabra, TNodo* nodo, SPila anteriores, int i,
+                           TNodo* origen, Arreglo* sugerencias,
+                           int maxProfundidad);
+// cola,
+//                            Arreglo* sugerencias);
 
-void __transponer_letras(char* palabra, Estructura* estructura, CDCola* cola,
-                         Arreglo* sugerencias);
+void __transponer_letras(char* palabra, TNodo* nodo, SPila anteriores, int i,
+                         TNodo* origen, Arreglo* sugerencias,
+                         int maxProfundidad);
+// Estructura* estructura, CDCola* cola,
+//                          Arreglo* sugerencias);
 
-void __separar_palabras(char* palabra, Estructura* estructura, CDCola* cola,
-                        Arreglo* sugerencias, TNodo* origen);
+void __separar_palabras(char* palabra, TNodo* nodo, SPila anteriores, int i,
+                        TNodo* origen, Arreglo* sugerencias,
+                        int maxProfundidad);
+// estructura, CDCola* cola,
+//  Arreglo* sugerencias, TNodo* origen);
 #endif  // __TRIE_H__

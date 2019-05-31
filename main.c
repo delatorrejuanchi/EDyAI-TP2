@@ -14,73 +14,83 @@
 // Si no, devuelve 0.
 // TODO: ver cuanto mejora si hacemos un read mayor
 int cargar_diccionario(Trie* trie, char* nombreDeArchivo) {
-  FILE* archivo = fopen(nombreDeArchivo, "r");
+  FILE* diccionario = fopen(nombreDeArchivo, "r");
 
-  if (archivo == NULL) return 0;
+  if (diccionario == NULL) return 0;
 
-  char buffer[100];
-  while (fscanf(archivo, "%s", buffer) != EOF) trie_agregar(trie, buffer);
+  char buffer[50];
 
-  fclose(archivo);
+  while (fscanf(diccionario, "%s", buffer) != EOF) trie_agregar(trie, buffer);
+
+  fclose(diccionario);
 
   return 1;
 }
 
 int main(int argc, char* argv[]) {
-  if (argc != 3) {
+  if (argc != 4) {
     printf("Error: el número de argumentos ingresados es incorrecto.\n");
-    printf("Modo de uso: %s [diccionario.txt] [texto.txt]\n", argv[0]);
+    printf("Modo de uso: %s [diccionario.txt] [texto.txt] [salida.txt]\n",
+           argv[0]);
     return 1;
   }
 
   Trie* trie = trie_crear();
-  char b[50];
-  printf("Activar modo debug? ");
-  scanf("%s", b);
-  if (strcmp(b, "si") != 0) {
-    clock_t t;
-    t = clock();
-    if (cargar_diccionario(trie, argv[1])) {
-      printf("Diccionario %s cargado exitosamente.\n", argv[1]);
-    } else {
-      printf("Se ha producido un error cargando el diccionario %s\n.", argv[1]);
-    }
-    t = clock() - t;
 
-    printf("CARGA DE DICCIONARIO: %lfs\n", ((double)t) / CLOCKS_PER_SEC);
+  clock_t timer;
+  timer = clock();
+  if (cargar_diccionario(trie, argv[1])) {
+    printf("Diccionario %s cargado exitosamente.\n", argv[1]);
   } else {
-    printf("Inserte el diccionario:\n");
-    scanf("%s", b);
-    while (strcmp(b, ".")) {
-      trie_agregar(trie, b);
-      scanf("%s", b);
-    }
+    printf("Se ha producido un error cargando el diccionario %s.\n", argv[1]);
+  }
+  timer = clock() - timer;
+  printf("CARGA DE DICCIONARIO: %lfs\n", ((double)timer) / CLOCKS_PER_SEC);
+
+  FILE* texto = fopen(argv[2], "r");
+  if (texto == NULL) {
+    printf("Se ha producido un error leyendo el texto %s.\n", argv[2]);
+    return 1;
   }
 
-  char buffer[50];
-  printf("Buscar palabra: ");
-  scanf("%s", buffer);
-  while (strcmp(buffer, ".")) {
-    if (trie_contiene(trie, buffer)) {
-      printf("Palabra encontrada!\n");
+  FILE* salida = fopen(argv[3], "w");
+  if (salida == NULL) {
+    printf("Se ha producido un error creando el archivo de salida %s.\n",
+           argv[3]);
+    return 1;
+  }
+
+  timer = clock();
+  char buffer[50], c;
+  int linea = 1, i = 0;
+  while ((c = fgetc(texto)) != EOF) {
+    if (caracter_a_indice(c) == -1) {
+      buffer[i] = '\0';
+
+      if (i != 0 && !trie_contiene(trie, buffer)) {
+        Arreglo* sugerencias = trie_sugerir(trie, buffer, CANTIDAD_SUGERENCIAS);
+        fprintf(salida, "Línea %d, \"%s\" no está en el diccionario.\n", linea,
+                buffer);
+        fprintf(salida, "Quizás quiso decir: %s", sugerencias->datos[0]);
+        for (int i = 1; i < CANTIDAD_SUGERENCIAS; i++) {
+          fprintf(salida, ", %s", sugerencias->datos[i]);
+        }
+        fprintf(salida, "\n\n");
+        arreglo_destruir(sugerencias);
+      }
+
+      i = 0;
+      if (c == '\n') linea++;
     } else {
-      printf("\"%s\" no está en el diccionario.\n", buffer);
-      clock_t t = clock();
-      Arreglo* sugerencias = trie_sugerir(trie, buffer, CANTIDAD_SUGERENCIAS);
-      t = clock() - t;
-      printf("Quizás quiso decir:");
-      for (int i = 0; i < CANTIDAD_SUGERENCIAS; i++)
-        printf(" \"%s\"", sugerencias->datos[i]);
-      printf("\n");
-
-      printf("CARGA DE SUGERENCIAS: %lfs\n", ((double)t) / CLOCKS_PER_SEC);
-
-      arreglo_destruir(sugerencias);
+      buffer[i] = c;
+      i++;
     }
+  }
+  timer = clock() - timer;
+  printf("CORRECCIÓN DEL TEXTO: %lfs\n", ((double)timer) / CLOCKS_PER_SEC);
 
-    printf("Buscar palabra: ");
-    scanf("%s", buffer);
-  };
+  fclose(texto);
+  fclose(salida);
 
   trie_destruir(trie);
 
