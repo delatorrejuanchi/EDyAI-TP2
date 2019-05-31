@@ -92,10 +92,10 @@ Arreglo* trie_sugerir(Trie* trie, char* palabra, int cantidadSugerencias) {
   while (sugerencias->nElems < cantidadSugerencias && !cdcola_vacia(cola)) {
     Estructura* estructura = cdcola_primero(cola);
 
-    // __intercambiar_letras(palabra, estructura, &cola, sugerencias);
-    // __agregar_letras(palabra, estructura, &cola, sugerencias);
-    // __eliminar_letras(palabra, estructura, &cola, sugerencias);
-    // __transponer_letras(palabra, estructura, &cola, sugerencias);
+    __intercambiar_letras(palabra, estructura, &cola, sugerencias);
+    __agregar_letras(palabra, estructura, &cola, sugerencias);
+    __eliminar_letras(palabra, estructura, &cola, sugerencias);
+    __transponer_letras(palabra, estructura, &cola, sugerencias);
     __separar_palabras(palabra, estructura, &cola, sugerencias, trie->origen);
 
     cola = cdcola_desencolar(cola, destruir_estructura);

@@ -6,7 +6,7 @@
 
 // Representa la cantidad de sugerencias a generar por cada
 // palabra incorrecta encontrada.
-#define CANTIDAD_SUGERENCIAS 1
+#define CANTIDAD_SUGERENCIAS 5
 
 // cargar_diccionario: Trie* char* -> int
 // Recibe un puntero a un Trie y un el nombre de archivo de un diccionario,
@@ -70,7 +70,7 @@ int main(int argc, char* argv[]) {
       t = clock() - t;
       printf("Quizás quiso decir:");
       for (int i = 0; i < CANTIDAD_SUGERENCIAS; i++)
-        printf(" %s", sugerencias->datos[i]);
+        printf(" \"%s\"", sugerencias->datos[i]);
       printf("\n");
 
       printf("CARGA DE SUGERENCIAS: %lfs\n", ((double)t) / CLOCKS_PER_SEC);
