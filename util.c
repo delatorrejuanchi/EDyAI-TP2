@@ -116,6 +116,18 @@ char indice_a_caracter(int indice) {
   return caracter;
 }
 
-void quizas_destruir(void* dato) {
-  if (dato != NULL) free(dato);
+void swap(char* palabra, int i, int j) {
+  char temp = palabra[i];
+  palabra[i] = palabra[j];
+  palabra[j] = temp;
+}
+
+void transponer_adyacentes(char* palabra, int i) {
+  int izqEspecial = palabra[i] == -61;
+  int derEspecial = palabra[i + izqEspecial + 1] == -61;
+
+  int ambosEspeciales = izqEspecial * derEspecial;
+  swap(palabra, i + ambosEspeciales, i + 1 + 2 * ambosEspeciales);
+
+  if (izqEspecial ^ derEspecial) swap(palabra, i + derEspecial, i + 2);
 }

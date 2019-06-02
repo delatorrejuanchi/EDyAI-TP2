@@ -119,6 +119,8 @@ int caracter_a_indice(char caracter, int permitirCaracteresEspeciales);
 //   ser representado correctamente.
 char indice_a_caracter(int indice);
 
-void quizas_destruir(void* dato);
+void swap(char* palabra, int i, int j);
+
+void transponer_adyacentes(char* palabra, int i);
 
 #endif  // __UTIL_H_

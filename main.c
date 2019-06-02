@@ -94,7 +94,7 @@ int main(int argc, char* argv[]) {
         }
 
         i = 0;
-        if (c == '\n') linea++;
+        if (c == '\n' || c == '\r') linea++;
       }
     }
   }

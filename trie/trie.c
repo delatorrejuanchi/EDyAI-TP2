@@ -84,14 +84,14 @@ void __transformar(char* palabra, TNodo* nodo, SPila anteriores, int i,
                    TNodo* origen, Arreglo* sugerencias, int maxProfundidad) {
   if (nodo == NULL || maxProfundidad == 0) return;
 
-  __transponer_letras(palabra, nodo, anteriores, i, origen, sugerencias,
-                      maxProfundidad);
   __agregar_letras(palabra, nodo, anteriores, i, origen, sugerencias,
                    maxProfundidad);
   __eliminar_letras(palabra, nodo, anteriores, i, origen, sugerencias,
                     maxProfundidad);
   __intercambiar_letras(palabra, nodo, anteriores, i, origen, sugerencias,
                         maxProfundidad);
+  __transponer_letras(palabra, nodo, anteriores, i, origen, sugerencias,
+                      maxProfundidad);
   __separar_palabras(palabra, nodo, anteriores, i, origen, sugerencias,
                      maxProfundidad);
 }
@@ -227,38 +227,18 @@ void __transponer_letras(char* palabra, TNodo* nodo, SPila anteriores, int i,
                          int maxProfundidad) {
   int longitud = strlen(palabra);
   for (int j = 0; j < longitud - i - 1 && !arreglo_lleno(sugerencias); j++) {
-    if (caracter_a_indice(palabra[i + j + 1], 1) == -1) {
-      char temp = palabra[i + j];
-      palabra[i + j] = -61;
-      palabra[i + j + 1] = palabra[i + j + 2];
-      palabra[i + j + 2] = temp;
+    transponer_adyacentes(palabra, i + j);
 
-      if (tnodo_buscar(nodo, palabra, i)) {
-        char* sugerencia = __reconstruir(anteriores, nodo, palabra, i);
-        if (!arreglo_anadir(sugerencias, sugerencia)) free(sugerencia);
-      }
-      __transformar(palabra, nodo, anteriores, i + 2, origen, sugerencias,
-                    maxProfundidad - 1);
-
-      palabra[i + j + 2] = palabra[i + j + 1];
-      palabra[i + j + 1] = -61;
-      palabra[i + j] = temp;
-
-    } else {
-      char temp = palabra[i + j];
-      palabra[i + j] = palabra[i + j + 1];
-      palabra[i + j + 1] = temp;
-
-      if (tnodo_buscar(nodo, palabra, i)) {
-        char* sugerencia = __reconstruir(anteriores, nodo, palabra, i);
-        if (!arreglo_anadir(sugerencias, sugerencia)) free(sugerencia);
-      }
-      __transformar(palabra, nodo, anteriores, i + 1, origen, sugerencias,
-                    maxProfundidad - 1);
-
-      palabra[i + j + 1] = palabra[i + j];
-      palabra[i + j] = temp;
+    if (tnodo_buscar(nodo, palabra, i)) {
+      char* sugerencia = __reconstruir(anteriores, nodo, palabra, i);
+      if (!arreglo_anadir(sugerencias, sugerencia)) free(sugerencia);
     }
+    __transformar(palabra, nodo, anteriores, i, origen, sugerencias,
+                  maxProfundidad - 1);
+
+    transponer_adyacentes(palabra, i + j);
+
+    if (caracter_a_indice(palabra[i + j], 1) == -1) j++;
   }
 }
 
