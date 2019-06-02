@@ -5,26 +5,6 @@
 #include <string.h>
 #include "../spila/spila.h"
 
-// TODO: perrogato -> perro gato a ?
-
-Estructura* estructura_crear(TNodo* tnodo, SPila anteriores, int i) {
-  Estructura* estructura = malloc(sizeof(Estructura));
-  estructura->nodo = tnodo;
-  estructura->anteriores = anteriores;
-  estructura->i = i;
-
-  return estructura;
-}
-
-// TODO: documentar
-void destruir_estructura(void* dato) {
-  Estructura* estructura = dato;
-  if (estructura->anteriores != NULL)
-    spila_destruir(estructura->anteriores, no_destruir);
-
-  free(dato);
-}
-
 TNodo* tnodo_crear() {
   TNodo* tnodo = malloc(sizeof(TNodo));
   tnodo->padre = NULL;
@@ -87,6 +67,7 @@ Arreglo* trie_sugerir(Trie* trie, char* palabra, int cantidadSugerencias) {
 
   int maxProfundidad = 0;
   while (!arreglo_lleno(sugerencias)) {
+    printf("%d\n", maxProfundidad);
     maxProfundidad++;
     __transformar(palabra, trie->origen, spila_crear(), 0, trie->origen,
                   sugerencias, maxProfundidad);
@@ -272,6 +253,7 @@ void __transponer_letras(char* palabra, TNodo* nodo, SPila anteriores, int i,
   }
 }
 
+// TODO: fix
 void __separar_palabras(char* palabra, TNodo* nodo, SPila anteriores, int i,
                         TNodo* origen, Arreglo* sugerencias,
                         int maxProfundidad) {

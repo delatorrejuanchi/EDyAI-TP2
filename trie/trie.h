@@ -1,7 +1,6 @@
 #if !defined(__TRIE_H__)
 #define __TRIE_H__
 
-#include "../cdcola/cdcola.h"
 #include "../slist/slist.h"
 #include "../spila/spila.h"
 #include "../util.h"
@@ -46,14 +45,6 @@ typedef struct _TNodo {
 typedef struct {
   TNodo* origen;
 } Trie;
-
-// TODO: renombrar
-// TODO: documentar
-typedef struct {
-  TNodo* nodo;
-  SPila anteriores;
-  int i;
-} Estructura;
 
 // tnodo_crear: -> TNodo*
 // Crea un TNodo con padre == NULL, identificador == -1 y termina == 0,
@@ -137,6 +128,11 @@ void __reconstruir_anterior(void* dato, void* extra);
 //   [anterior_n] [anterior_n-1] ... [anterior_1] [prefijo][sufijo]
 char* __reconstruir(SPila anteriores, TNodo* nodoActual, char* palabra, int i);
 
+// TODO: documentar
+void __transformar(char* palabra, TNodo* nodo, SPila anteriores, int i,
+                   TNodo* origen, Arreglo* sugerencias, int maxProfundidad);
+
+// TODO: arreglar
 // __agregar_letras: char* Estructura* CDCola* Arreglo* -> void
 // Recibe una palabra, un puntero a una Estructura, un puntero a una CDCola y un
 // puntero a un Arreglo,
@@ -151,35 +147,26 @@ char* __reconstruir(SPila anteriores, TNodo* nodoActual, char* palabra, int i);
 // - i == "indice en donde se agregó la letra"
 // void __agregar_letras(char* palabra, Estructura* estructura, CDCola* cola,
 //                       Arreglo* sugerencias);
-
-void __transformar(char* palabra, TNodo* nodo, SPila anteriores, int i,
-                   TNodo* origen, Arreglo* sugerencias, int maxProfundidad);
-
 void __agregar_letras(char* palabra, TNodo* nodo, SPila anteriores, int i,
                       TNodo* origen, Arreglo* sugerencias, int maxProfundidad);
-// __eliminar_letras: char* Estructura* CDCola* Arreglo* -> void
+
 // TODO: documentar
-// void __eliminar_letras(char* palabra, Estructura* estructura, CDCola*
-// cola,
-//                        Arreglo* sugerencias);
 void __eliminar_letras(char* palabra, TNodo* nodo, SPila anteriores, int i,
                        TNodo* origen, Arreglo* sugerencias, int maxProfundidad);
 
+// TODO: documentar
 void __intercambiar_letras(char* palabra, TNodo* nodo, SPila anteriores, int i,
                            TNodo* origen, Arreglo* sugerencias,
                            int maxProfundidad);
-// cola,
-//                            Arreglo* sugerencias);
 
+// TODO: documentar
 void __transponer_letras(char* palabra, TNodo* nodo, SPila anteriores, int i,
                          TNodo* origen, Arreglo* sugerencias,
                          int maxProfundidad);
-// Estructura* estructura, CDCola* cola,
-//                          Arreglo* sugerencias);
 
+// TODO: documentar
 void __separar_palabras(char* palabra, TNodo* nodo, SPila anteriores, int i,
                         TNodo* origen, Arreglo* sugerencias,
                         int maxProfundidad);
-// estructura, CDCola* cola,
-//  Arreglo* sugerencias, TNodo* origen);
+
 #endif  // __TRIE_H__
