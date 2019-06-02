@@ -1,5 +1,5 @@
 main: main.c util.o slist.o spila.o trie.o
-			gcc -g -o main main.c util.o slist.o spila.o cdlist.o cdcola.o trie.o -Wall -pedantic
+			gcc -g -o main main.c util.o slist.o spila.o trie.o -Wall -pedantic
 
 util.o: util.c
 				gcc -g -c util.c -Wall -pedantic
