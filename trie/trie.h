@@ -105,14 +105,14 @@ void trie_destruir(Trie* trie);
 // Agrega a la pila el caracter correspondiente al nodo, el correspondiente al
 // padre del nodo, el correspondiente al padre del padre del nodo, ..., hasta
 // llegar al origen.
-void __apilar_padres(TNodo* tnodo, SPila* caracteres);
+void _apilar_padres(TNodo* tnodo, SPila* caracteres);
 
 // __reconstruir_anterior: void* void* -> void
 // Recibe un puntero a un dato (TNodo) y un puntero a un dato extra (SPila),
 // Apila un caracter ' ' a la SPila, y luego llama __apilar_padres sobre el
 // TNodo* recibido.
 // Esta función es de tipo FVisitanteExtra.
-void __reconstruir_anterior(void* dato, void* extra);
+void _reconstruir_anterior(void* dato, void* extra);
 
 // __reconstruir: SPila TNodo* char* int -> char*
 // Recibe una SPila de TNodo* (anteriores), un puntero a un TNodo (nodoActual),
@@ -126,11 +126,11 @@ void __reconstruir_anterior(void* dato, void* extra);
 // -> sufijo
 // Es decir, la palabra resultante es de la forma:
 //   [anterior_n] [anterior_n-1] ... [anterior_1] [prefijo][sufijo]
-char* __reconstruir(SPila anteriores, TNodo* nodoActual, char* palabra, int i);
+char* _reconstruir(SPila anteriores, TNodo* nodoActual, char* palabra, int i);
 
 // TODO: documentar
-void __transformar(char* palabra, TNodo* nodo, SPila anteriores, int i,
-                   TNodo* origen, Arreglo* sugerencias, int maxProfundidad);
+void _transformar(char* palabra, TNodo* nodo, SPila anteriores, int i,
+                  TNodo* origen, Arreglo* sugerencias, int maxProfundidad);
 
 // TODO: arreglar
 // __agregar_letras: char* Estructura* CDCola* Arreglo* -> void
@@ -147,26 +147,25 @@ void __transformar(char* palabra, TNodo* nodo, SPila anteriores, int i,
 // - i == "indice en donde se agregó la letra"
 // void __agregar_letras(char* palabra, Estructura* estructura, CDCola* cola,
 //                       Arreglo* sugerencias);
-void __agregar_letras(char* palabra, TNodo* nodo, SPila anteriores, int i,
+void _agregar_letras(char* palabra, TNodo* nodo, SPila anteriores, int i,
+                     TNodo* origen, Arreglo* sugerencias, int maxProfundidad);
+
+// TODO: documentar
+void _eliminar_letras(char* palabra, TNodo* nodo, SPila anteriores, int i,
                       TNodo* origen, Arreglo* sugerencias, int maxProfundidad);
 
 // TODO: documentar
-void __eliminar_letras(char* palabra, TNodo* nodo, SPila anteriores, int i,
-                       TNodo* origen, Arreglo* sugerencias, int maxProfundidad);
+void _intercambiar_letras(char* palabra, TNodo* nodo, SPila anteriores, int i,
+                          TNodo* origen, Arreglo* sugerencias,
+                          int maxProfundidad);
 
 // TODO: documentar
-void __intercambiar_letras(char* palabra, TNodo* nodo, SPila anteriores, int i,
-                           TNodo* origen, Arreglo* sugerencias,
-                           int maxProfundidad);
-
-// TODO: documentar
-void __transponer_letras(char* palabra, TNodo* nodo, SPila anteriores, int i,
-                         TNodo* origen, Arreglo* sugerencias,
-                         int maxProfundidad);
-
-// TODO: documentar
-void __separar_palabras(char* palabra, TNodo* nodo, SPila anteriores, int i,
+void _transponer_letras(char* palabra, TNodo* nodo, SPila anteriores, int i,
                         TNodo* origen, Arreglo* sugerencias,
                         int maxProfundidad);
+
+// TODO: documentar
+void _separar_palabras(char* palabra, TNodo* nodo, SPila anteriores, int i,
+                       TNodo* origen, Arreglo* sugerencias, int maxProfundidad);
 
 #endif  // __TRIE_H__
