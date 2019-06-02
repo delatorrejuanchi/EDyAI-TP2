@@ -62,28 +62,36 @@ int main(int argc, char* argv[]) {
 
   timer = clock();
   char buffer[50], c;
-  int linea = 1, i = 0;
+  int linea = 1, i = 0, insertandoCaracterEspecial = 0;
   while ((c = fgetc(texto)) != EOF) {
-    if (caracter_a_indice(c) == -1) {
-      buffer[i] = '\0';
-
-      if (i != 0 && !trie_contiene(trie, buffer)) {
-        Arreglo* sugerencias = trie_sugerir(trie, buffer, CANTIDAD_SUGERENCIAS);
-        fprintf(salida, "Línea %d, \"%s\" no está en el diccionario.\n", linea,
-                buffer);
-        fprintf(salida, "Quizás quiso decir: %s", sugerencias->datos[0]);
-        for (int i = 1; i < CANTIDAD_SUGERENCIAS; i++) {
-          fprintf(salida, ", %s", sugerencias->datos[i]);
+    if (c == -61)
+      insertandoCaracterEspecial = 1;
+    else {
+      if (caracter_a_indice(c, insertandoCaracterEspecial) != -1) {
+        if (insertandoCaracterEspecial) {
+          buffer[i++] = -61;
+          insertandoCaracterEspecial = 0;
         }
-        fprintf(salida, "\n\n");
-        arreglo_destruir(sugerencias);
-      }
+        buffer[i++] = c;
+      } else if (i != 0) {
+        buffer[i] = '\0';
 
-      i = 0;
-      if (c == '\n') linea++;
-    } else {
-      buffer[i] = c;
-      i++;
+        if (!trie_contiene(trie, buffer)) {
+          Arreglo* sugerencias =
+              trie_sugerir(trie, buffer, CANTIDAD_SUGERENCIAS);
+          fprintf(salida, "Línea %d, \"%s\" no está en el diccionario.\n",
+                  linea, buffer);
+          fprintf(salida, "Quizás quiso decir: %s", sugerencias->datos[0]);
+          for (int i = 1; i < CANTIDAD_SUGERENCIAS; i++) {
+            fprintf(salida, ", %s", sugerencias->datos[i]);
+          }
+          fprintf(salida, "\n\n");
+          arreglo_destruir(sugerencias);
+        }
+
+        i = 0;
+        if (c == '\n') linea++;
+      }
     }
   }
   timer = clock() - timer;

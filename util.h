@@ -91,6 +91,7 @@ Caracter* caracter_crear(char c);
 
 #define TAMANO_ALFABETO 33
 
+// TODO: fix
 // caracter_a_indice: char -> int
 // Recibe un caracter,
 // Devuelve el entero que se le asigna según la representación de caracteres.
@@ -101,7 +102,7 @@ Caracter* caracter_crear(char c);
 //   luego un char == -79. En esta función, ignoramos el -61 devolviendo -1 y
 //   consideramos solo el siguiente valor, -79, que determina cual de los
 //   caracteres especiales fue ingresado, devolviendo su representación 32.
-int caracter_a_indice(char caracter);
+int caracter_a_indice(char caracter, int permitirCaracteresEspeciales);
 
 // indice_a_caracter: int -> char
 // Recibe un entero,

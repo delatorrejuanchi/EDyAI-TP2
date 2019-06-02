@@ -48,13 +48,13 @@ Caracter* caracter_crear(char c) {
   return caracter;
 }
 
-int caracter_a_indice(char caracter) {
+int caracter_a_indice(char caracter, int permitirCaracteresEspeciales) {
   int indice = -1;
   if ('a' <= caracter && caracter <= 'z')
     indice = caracter - 'a';
   else if ('A' <= caracter && caracter <= 'Z')
     indice = caracter - 'A';
-  else {
+  else if (permitirCaracteresEspeciales) {
     if (caracter <= -100) caracter -= 32;
     switch ((int)caracter) {
       case -95:
