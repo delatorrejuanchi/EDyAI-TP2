@@ -92,8 +92,8 @@ void __transformar(char* palabra, TNodo* nodo, SPila anteriores, int i,
                     maxProfundidad);
   __intercambiar_letras(palabra, nodo, anteriores, i, origen, sugerencias,
                         maxProfundidad);
-  // __separar_palabras(palabra, nodo, anteriores, i, origen, sugerencias,
-  //                    maxProfundidad);
+  __separar_palabras(palabra, nodo, anteriores, i, origen, sugerencias,
+                     maxProfundidad);
 }
 
 void __apilar_padres(TNodo* tnodo, SPila* caracteres) {
@@ -262,16 +262,16 @@ void __separar_palabras(char* palabra, TNodo* nodo, SPila anteriores, int i,
     int indice = caracter_a_indice(palabra[i + j], 1);
     if (indice != -1 && nodo->hijos[indice] != NULL &&
         nodo->hijos[indice]->termina) {
-      anteriores = spila_push(anteriores, nodo->hijos[indice]);
+      SPila anterioresNuevo = spila_push(anteriores, nodo->hijos[indice]);
       if (tnodo_buscar(origen, palabra, i + j + 1)) {
         char* sugerencia =
-            __reconstruir(anteriores, origen, palabra, j + i + 1);
+            __reconstruir(anterioresNuevo, origen, palabra, j + i + 1);
         if (!arreglo_anadir(sugerencias, sugerencia)) free(sugerencia);
       }
 
-      __transformar(palabra, origen, anteriores, i + j + 1, origen, sugerencias,
-                    maxProfundidad - 1);
-      free(anteriores);
+      __transformar(palabra, origen, anterioresNuevo, i + j + 1, origen,
+                    sugerencias, maxProfundidad - 1);
+      free(anterioresNuevo);
     }
 
     if (indice != -1) nodo = nodo->hijos[indice];

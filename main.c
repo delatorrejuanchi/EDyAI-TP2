@@ -75,7 +75,6 @@ int main(int argc, char* argv[]) {
         buffer[i++] = c;
       } else if (i != 0) {
         buffer[i] = '\0';
-
         if (!trie_contiene(trie, buffer)) {
           Arreglo* sugerencias =
               trie_sugerir(trie, buffer, CANTIDAD_SUGERENCIAS);
