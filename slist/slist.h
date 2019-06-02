@@ -58,7 +58,4 @@ int slist_longitud(SList slist);
 // Devuelve 1 si la lista contiene a la cadena, 0 en caso contrario.
 // int slist_contiene(SList slist, void* dato);
 
-// TODO: documentar, agregar funcion duplicadora?
-SList slist_duplicar(SList slist);
-
 #endif  // __SLIST_H__

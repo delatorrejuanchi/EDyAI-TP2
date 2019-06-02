@@ -260,30 +260,6 @@ void __transponer_letras(char* palabra, TNodo* nodo, SPila anteriores, int i,
       palabra[i + j] = temp;
     }
   }
-
-  // int seguir = nodo != NULL && !arreglo_lleno(sugerencias);
-  // for (int j = 0; j < longitud - i - 1 && seguir; j++) {
-  //   int pos = i + j + 1;
-  //   if (caracter_a_indice(palabra[pos], 1) == -1 && pos < longitud) pos++;
-
-  //   int indice = caracter_a_indice(palabra[i + j], 1);
-  //   int indiceSig = caracter_a_indice(palabra[pos], 1);
-  //   if (indice != -1 && indiceSig != -1 && nodo->hijos[indiceSig] != NULL &&
-  //       nodo->hijos[indiceSig]->hijos[indice] != NULL) {
-  //     TNodo* auxiliar = nodo->hijos[indiceSig]->hijos[indice];
-  //     if (tnodo_buscar(auxiliar, palabra, i + j + 2)) {
-  //       char* sugerencia =
-  //           __reconstruir(anteriores, auxiliar, palabra, j + i + 2);
-  //       if (!arreglo_anadir(sugerencias, sugerencia)) free(sugerencia);
-  //     }
-
-  //     __transformar(palabra, auxiliar, anteriores, i + j + 2, origen,
-  //                   sugerencias, maxProfundidad - 1);
-  //   }
-
-  //   if (indice != -1) nodo = nodo->hijos[indice];
-  //   seguir = nodo != NULL && !arreglo_lleno(sugerencias);
-  // }
 }
 
 void __separar_palabras(char* palabra, TNodo* nodo, SPila anteriores, int i,
