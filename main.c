@@ -63,6 +63,7 @@ int main(int argc, char* argv[]) {
   timer = clock();
   char buffer[50], c;
   int linea = 1, i = 0, insertandoCaracterEspecial = 0;
+  int cantPalabrasLeidas = 0, cantPalabrasIncorrectas = 0;
   while ((c = fgetc(texto)) != EOF) {
     if (c == -61)
       insertandoCaracterEspecial = 1;
@@ -74,8 +75,12 @@ int main(int argc, char* argv[]) {
         }
         buffer[i++] = c;
       } else if (i != 0) {
+        cantPalabrasLeidas++;
+
         buffer[i] = '\0';
         if (!trie_contiene(trie, buffer)) {
+          cantPalabrasIncorrectas++;
+
           Arreglo* sugerencias =
               trie_sugerir(trie, buffer, CANTIDAD_SUGERENCIAS);
           fprintf(salida, "Línea %d, \"%s\" no está en el diccionario.\n",
@@ -95,6 +100,8 @@ int main(int argc, char* argv[]) {
   }
   timer = clock() - timer;
   printf("CORRECCIÓN DEL TEXTO: %lfs\n", ((double)timer) / CLOCKS_PER_SEC);
+  printf("CANTIDAD DE PALABRAS LEÍDAS: %d\n", cantPalabrasLeidas);
+  printf("CANTIDAD DE PALABRAS INCORRECTAS: %d\n", cantPalabrasIncorrectas);
 
   fclose(texto);
   fclose(salida);
