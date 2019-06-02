@@ -39,7 +39,7 @@ typedef struct _TNodo {
   struct _TNodo* hijos[TAMANO_ALFABETO];
   int identificador;
   int termina;
-  // int maxProfundidad; TODO: implementar
+  int maxProfundidad;
 } TNodo;
 
 typedef struct {
@@ -130,7 +130,7 @@ char* _reconstruir(SPila anteriores, TNodo* nodoActual, char* palabra, int i);
 
 // TODO: documentar
 void _transformar(char* palabra, TNodo* nodo, SPila anteriores, int i,
-                  TNodo* origen, Arreglo* sugerencias, int maxProfundidad);
+                  TNodo* origen, Arreglo* sugerencias, int N);
 
 // TODO: arreglar
 // __agregar_letras: char* Estructura* CDCola* Arreglo* -> void
@@ -148,24 +148,22 @@ void _transformar(char* palabra, TNodo* nodo, SPila anteriores, int i,
 // void __agregar_letras(char* palabra, Estructura* estructura, CDCola* cola,
 //                       Arreglo* sugerencias);
 void _agregar_letras(char* palabra, TNodo* nodo, SPila anteriores, int i,
-                     TNodo* origen, Arreglo* sugerencias, int maxProfundidad);
+                     TNodo* origen, Arreglo* sugerencias, int N);
 
 // TODO: documentar
 void _eliminar_letras(char* palabra, TNodo* nodo, SPila anteriores, int i,
-                      TNodo* origen, Arreglo* sugerencias, int maxProfundidad);
+                      TNodo* origen, Arreglo* sugerencias, int N);
 
 // TODO: documentar
 void _intercambiar_letras(char* palabra, TNodo* nodo, SPila anteriores, int i,
-                          TNodo* origen, Arreglo* sugerencias,
-                          int maxProfundidad);
+                          TNodo* origen, Arreglo* sugerencias, int N);
 
 // TODO: documentar
 void _transponer_letras(char* palabra, TNodo* nodo, SPila anteriores, int i,
-                        TNodo* origen, Arreglo* sugerencias,
-                        int maxProfundidad);
+                        TNodo* origen, Arreglo* sugerencias, int N);
 
 // TODO: documentar
 void _separar_palabras(char* palabra, TNodo* nodo, SPila anteriores, int i,
-                       TNodo* origen, Arreglo* sugerencias, int maxProfundidad);
+                       TNodo* origen, Arreglo* sugerencias, int N);
 
 #endif  // __TRIE_H__

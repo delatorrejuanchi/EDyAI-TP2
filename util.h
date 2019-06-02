@@ -1,6 +1,8 @@
 #if !defined(__UTIL_H__)
 #define __UTIL_H__
 
+#define MAX(a, b) (((a) > (b)) ? (a) : (b))
+
 // Una FDestructora es una función que recibe un puntero a un dato y lo
 // destruye. Es usada como argumento de varias funciones que implican eliminar
 // un dato, como por ejemplo:
