@@ -6,39 +6,39 @@ void destruir_generico(void* dato) { free(dato); }
 
 void no_destruir(void* dato) {}
 
-Arreglo* arreglo_crear(int tamano) {
-  Arreglo* arreglo = malloc(sizeof(Arreglo));
-  arreglo->datos = malloc(sizeof(char*) * tamano);
-  for (int i = 0; i < tamano; i++) arreglo->datos[i] = NULL;
-  arreglo->tamano = tamano;
-  arreglo->nElems = 0;
+Sugerencias* sugerencias_crear(int tamano) {
+  Sugerencias* sugerencias = malloc(sizeof(Sugerencias));
+  sugerencias->datos = malloc(sizeof(char*) * tamano);
+  for (int i = 0; i < tamano; i++) sugerencias->datos[i] = NULL;
+  sugerencias->tamano = tamano;
+  sugerencias->nElems = 0;
 
-  return arreglo;
+  return sugerencias;
 }
 
-int arreglo_anadir(Arreglo* arreglo, char* palabra) {
-  if (arreglo->nElems == arreglo->tamano) return 0;
+int sugerencias_anadir(Sugerencias* sugerencias, char* palabra) {
+  if (sugerencias->nElems == sugerencias->tamano) return 0;
   int i = 0;
-  while (i < arreglo->nElems && strcmp(arreglo->datos[i], palabra)) i++;
-  if (i == arreglo->nElems) {
-    arreglo->datos[i] = palabra;
-    arreglo->nElems++;
+  while (i < sugerencias->nElems && strcmp(sugerencias->datos[i], palabra)) i++;
+  if (i == sugerencias->nElems) {
+    sugerencias->datos[i] = palabra;
+    sugerencias->nElems++;
     return 1;
   } else
     return 0;
 }
 
-void arreglo_destruir(Arreglo* arreglo) {
-  for (int i = 0; i < arreglo->nElems; i++) {
-    free(arreglo->datos[i]);
+void sugerencias_destruir(Sugerencias* sugerencias) {
+  for (int i = 0; i < sugerencias->nElems; i++) {
+    free(sugerencias->datos[i]);
   }
 
-  free(arreglo->datos);
-  free(arreglo);
+  free(sugerencias->datos);
+  free(sugerencias);
 }
 
-int arreglo_lleno(Arreglo* arreglo) {
-  return arreglo->nElems == arreglo->tamano;
+int sugerencias_lleno(Sugerencias* sugerencias) {
+  return sugerencias->nElems == sugerencias->tamano;
 }
 
 Caracter* caracter_crear(char c) {

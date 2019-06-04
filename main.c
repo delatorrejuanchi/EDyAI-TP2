@@ -4,15 +4,39 @@
 #include <time.h>
 #include "trie/trie.h"
 
-// Representa la cantidad de sugerencias a generar por cada
-// palabra incorrecta encontrada.
+// Para compilar el programa utilizamos un Makefile:
+// $ make
+
+// MODO DE USO:
+// $ ./main [diccionario.txt] [texto.txt] [salida.txt]
+// Genera CANTIDAD_SUGERENCIAS sugerencias para aquellas palabras en [texto.txt]
+// que no se encuentran el [diccionario.txt]. Escribe estas sugerencias a
+// [salida.txt].
+// Genera sugerencias aplicando recursivamente las siguientes técnicas:
+// - Agregar letras
+// - Eliminar letras
+// - Intercambiar letras
+// - Trasponer letras adyacentes
+// - Separar palabras
+// El archivo [diccionario.txt] debe tener una palabra por línea. Los únicos
+// caracteres permitidos en este archivo son las letras del abecedario, y las
+// letras á, é, í, ó, ú, ü y ñ. Asimismo, no distinguimos entre mayúsculas y
+// minúsculas.
+// El archivo [texto.txt] debe finalizar con un salto de línea.
+// Por cada sugerencia encontrada, se escrribe a [salida.txt] texto con el
+// siguiente formato:
+//    Línea N: "palabra", no se encuentra en el diccionario
+//    Quizas quizo decir: "sugerencia1", "sugerencia2", "sugerencia3",
+//    "sugerencia4","sugerencia5"
+
+// Representa la cantidad de sugerencias a generar por cada palabra incorrecta
+// encontrada.
 #define CANTIDAD_SUGERENCIAS 5
 
 // cargar_diccionario: Trie* char* -> int
-// Recibe un puntero a un Trie y un el nombre de archivo de un diccionario,
+// Recibe un puntero a un Trie y el nombre de archivo de un diccionario,
 // Si el archivo existe, agrega todas las palabras al Trie, y devuelve 1.
 // Si no, devuelve 0.
-// TODO: ver cuanto mejora si hacemos un read mayor
 int cargar_diccionario(Trie* trie, char* nombreDeArchivo) {
   FILE* diccionario = fopen(nombreDeArchivo, "r");
 
@@ -81,7 +105,7 @@ int main(int argc, char* argv[]) {
         if (!trie_contiene(trie, buffer)) {
           cantPalabrasIncorrectas++;
 
-          Arreglo* sugerencias =
+          Sugerencias* sugerencias =
               trie_sugerir(trie, buffer, CANTIDAD_SUGERENCIAS);
           fprintf(salida, "Línea %d, \"%s\" no está en el diccionario.\n",
                   linea, buffer);
@@ -90,7 +114,7 @@ int main(int argc, char* argv[]) {
             fprintf(salida, ", %s", sugerencias->datos[i]);
           }
           fprintf(salida, "\n\n");
-          arreglo_destruir(sugerencias);
+          sugerencias_destruir(sugerencias);
         }
 
         i = 0;

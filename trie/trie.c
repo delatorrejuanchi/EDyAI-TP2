@@ -56,7 +56,7 @@ void trie_agregar(Trie* trie, char* palabra) {
         nodo->hijos[indice]->identificador = indice;
       }
 
-      nodo->maxProfundidad = MAX(nodo->maxProfundidad, longitud - i);
+      nodo->maxProfundidad = max(nodo->maxProfundidad, longitud - i);
       nodo = nodo->hijos[indice];
     }
   }
@@ -68,11 +68,11 @@ int trie_contiene(Trie* trie, char* palabra) {
   return tnodo_buscar(trie->origen, palabra, 0);
 }
 
-Arreglo* trie_sugerir(Trie* trie, char* palabra, int cantidadSugerencias) {
-  Arreglo* sugerencias = arreglo_crear(cantidadSugerencias);
+Sugerencias* trie_sugerir(Trie* trie, char* palabra, int cantidadSugerencias) {
+  Sugerencias* sugerencias = sugerencias_crear(cantidadSugerencias);
 
   int N = 0;
-  while (!arreglo_lleno(sugerencias)) {
+  while (!sugerencias_lleno(sugerencias)) {
     N++;
     _transformar(palabra, trie->origen, spila_crear(), 0, trie->origen,
                  sugerencias, N);
@@ -87,7 +87,7 @@ void trie_destruir(Trie* trie) {
 }
 
 void _transformar(char* palabra, TNodo* nodo, SPila anteriores, int i,
-                  TNodo* origen, Arreglo* sugerencias, int N) {
+                  TNodo* origen, Sugerencias* sugerencias, int N) {
   if (nodo == NULL || N == 0) return;
 
   _agregar_letras(palabra, nodo, anteriores, i, origen, sugerencias, N);
@@ -140,12 +140,12 @@ char* _reconstruir(SPila anteriores, TNodo* nodoActual, char* palabra, int i) {
 }
 
 void _agregar_letras(char* palabra, TNodo* nodo, SPila anteriores, int i,
-                     TNodo* origen, Arreglo* sugerencias, int N) {
+                     TNodo* origen, Sugerencias* sugerencias, int N) {
   int longitud = strlen(palabra);
 
   if (nodo->maxProfundidad < longitud - i) return;
   int j = 0;
-  while (j <= longitud - i && nodo != NULL && !arreglo_lleno(sugerencias)) {
+  while (j <= longitud - i && nodo != NULL && !sugerencias_lleno(sugerencias)) {
     int indice = caracter_a_indice(palabra[j + i], 1);
 
     int c = 0;
@@ -155,7 +155,7 @@ void _agregar_letras(char* palabra, TNodo* nodo, SPila anteriores, int i,
           char* sugerencia =
               _reconstruir(anteriores, nodo->hijos[c], palabra, j + i);
 
-          if (!arreglo_anadir(sugerencias, sugerencia)) free(sugerencia);
+          if (!sugerencias_anadir(sugerencias, sugerencia)) free(sugerencia);
         }
 
         _transformar(palabra, nodo->hijos[c], anteriores, i + j, origen,
@@ -170,11 +170,11 @@ void _agregar_letras(char* palabra, TNodo* nodo, SPila anteriores, int i,
 }
 
 void _eliminar_letras(char* palabra, TNodo* nodo, SPila anteriores, int i,
-                      TNodo* origen, Arreglo* sugerencias, int N) {
+                      TNodo* origen, Sugerencias* sugerencias, int N) {
   int longitud = strlen(palabra);
 
   int j = 0;
-  while (j < longitud - i && nodo != NULL && !arreglo_lleno(sugerencias)) {
+  while (j < longitud - i && nodo != NULL && !sugerencias_lleno(sugerencias)) {
     int indice = caracter_a_indice(palabra[i + j], 1);
     int indiceSig = caracter_a_indice(palabra[i + j + 1], 1);
 
@@ -182,7 +182,7 @@ void _eliminar_letras(char* palabra, TNodo* nodo, SPila anteriores, int i,
     if (indice != -1 && intentar) {
       if (tnodo_buscar(nodo, palabra, i + j + 1)) {
         char* sugerencia = _reconstruir(anteriores, nodo, palabra, j + i + 1);
-        if (!arreglo_anadir(sugerencias, sugerencia)) free(sugerencia);
+        if (!sugerencias_anadir(sugerencias, sugerencia)) free(sugerencia);
       }
 
       _transformar(palabra, nodo, anteriores, i + j + 1, origen, sugerencias,
@@ -195,11 +195,11 @@ void _eliminar_letras(char* palabra, TNodo* nodo, SPila anteriores, int i,
 }
 
 void _intercambiar_letras(char* palabra, TNodo* nodo, SPila anteriores, int i,
-                          TNodo* origen, Arreglo* sugerencias, int N) {
+                          TNodo* origen, Sugerencias* sugerencias, int N) {
   int longitud = strlen(palabra);
 
   int j = 0;
-  while (j < longitud - i && nodo != NULL && !arreglo_lleno(sugerencias)) {
+  while (j < longitud - i && nodo != NULL && !sugerencias_lleno(sugerencias)) {
     int indice = caracter_a_indice(palabra[j + i], 1);
 
     int c = 0;
@@ -209,7 +209,7 @@ void _intercambiar_letras(char* palabra, TNodo* nodo, SPila anteriores, int i,
           char* sugerencia =
               _reconstruir(anteriores, nodo->hijos[c], palabra, j + i + 1);
 
-          if (!arreglo_anadir(sugerencias, sugerencia)) free(sugerencia);
+          if (!sugerencias_anadir(sugerencias, sugerencia)) free(sugerencia);
         }
 
         _transformar(palabra, nodo->hijos[c], anteriores, i + j + 1, origen,
@@ -225,15 +225,15 @@ void _intercambiar_letras(char* palabra, TNodo* nodo, SPila anteriores, int i,
 }
 
 void _transponer_letras(char* palabra, TNodo* nodo, SPila anteriores, int i,
-                        TNodo* origen, Arreglo* sugerencias, int N) {
+                        TNodo* origen, Sugerencias* sugerencias, int N) {
   int longitud = strlen(palabra);
 
-  for (int j = 0; j < longitud - i - 1 && !arreglo_lleno(sugerencias); j++) {
+  for (int j = 0; j < longitud - i - 1 && !sugerencias_lleno(sugerencias); j++) {
     transponer_adyacentes(palabra, i + j);
 
     if (tnodo_buscar(nodo, palabra, i)) {
       char* sugerencia = _reconstruir(anteriores, nodo, palabra, i);
-      if (!arreglo_anadir(sugerencias, sugerencia)) free(sugerencia);
+      if (!sugerencias_anadir(sugerencias, sugerencia)) free(sugerencia);
     }
 
     _transformar(palabra, nodo, anteriores, i, origen, sugerencias, N - 1);
@@ -245,11 +245,11 @@ void _transponer_letras(char* palabra, TNodo* nodo, SPila anteriores, int i,
 }
 
 void _separar_palabras(char* palabra, TNodo* nodo, SPila anteriores, int i,
-                       TNodo* origen, Arreglo* sugerencias, int N) {
+                       TNodo* origen, Sugerencias* sugerencias, int N) {
   int longitud = strlen(palabra);
 
   int j = 0;
-  while (j < longitud - i && nodo != NULL && !arreglo_lleno(sugerencias)) {
+  while (j < longitud - i && nodo != NULL && !sugerencias_lleno(sugerencias)) {
     int indice = caracter_a_indice(palabra[i + j], 1);
     TNodo* hijo = nodo->hijos[indice];
 
@@ -259,7 +259,7 @@ void _separar_palabras(char* palabra, TNodo* nodo, SPila anteriores, int i,
       if (tnodo_buscar(origen, palabra, i + j + 1)) {
         char* sugerencia =
             _reconstruir(_anteriores, origen, palabra, i + j + 1);
-        if (!arreglo_anadir(sugerencias, sugerencia)) free(sugerencia);
+        if (!sugerencias_anadir(sugerencias, sugerencia)) free(sugerencia);
       }
 
       _transformar(palabra, origen, _anteriores, i + j + 1, origen, sugerencias,

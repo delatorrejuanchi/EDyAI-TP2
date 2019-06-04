@@ -1,35 +1,12 @@
 #if !defined(__UTIL_H__)
 #define __UTIL_H__
 
-#define MAX(a, b) (((a) > (b)) ? (a) : (b))
-
 // Una FDestructora es una función que recibe un puntero a un dato y lo
 // destruye. Es usada como argumento de varias funciones que implican eliminar
 // un dato, como por ejemplo:
 // - slist_eliminar_inicio, slist_destruir
-// - cdlist_eliminar_inicio, cdlist_destruir
 // - spila_pop, spila_destruir
-// - cdcola_desencolar, cdcola_destruir
 typedef void (*FDestructora)(void*);
-
-// Una FVisitante es una función que recibe un puntero a un dato y hace algo con
-// él (por ejemplo, lo muestra en pantalla). Es usada como argumento a varias
-// funciones en las que se recorre una estructura de datos, como por ejemplo:
-// - slist_recorrer
-// - cdlist_recorrer
-// - spila_recorrer
-// - cdcola_recorrer
-typedef void (*FVisitante)(void*);
-
-// Una FVisitanteExtra es una función que recibe un puntero a un dato y un
-// puntero a un dato extra, y utiliza el primer dato para modificar el valor del
-// dato extra. Es usada como argumento a varias funciones en las que se recorre
-// una estructura de datos, como por ejemplo:
-// - slist_recorrer_extra
-// - cdlist_recorrer_extra TODO: implementar
-// - spila_recorrer_extra
-// - cdcola_recorrer_extra TODO: implementar
-typedef void (*FVisitanteExtra)(void*, void*);
 
 // no_destruir: void* -> void
 // Recibe un puntero a un dato,
@@ -45,27 +22,50 @@ void no_destruir(void* dato);
 // para eliminar correctamente el dato.
 void destruir_generico(void* dato);
 
-// TODO: considerar extraer a arreglo/arreglo.h, con un dato generico, de manera
-// que se le puedan implementar recorrer, recorrer_extra y destruir. En ese caso
-// agregar referencias arriba a la nueva estructura.
-// TODO: documentar
+// Una FVisitante es una función que recibe un puntero a un dato y hace algo con
+// él (por ejemplo, lo muestra en pantalla). Es usada como argumento a varias
+// funciones en las que se recorre una estructura de datos, como por ejemplo:
+// - slist_recorrer
+// - spila_recorrer
+typedef void (*FVisitante)(void*);
+
+// Una FVisitanteExtra es una función que recibe un puntero a un dato y un
+// puntero a un dato extra, y utiliza el primer dato para modificar el valor del
+// dato extra. Es usada como argumento a varias funciones en las que se recorre
+// una estructura de datos, como por ejemplo:
+// - slist_recorrer_extra
+// - spila_recorrer_extra
+typedef void (*FVisitanteExtra)(void*, void*);
+
+// Definimos la siguiente estructura Sugerencias para guardar las sugerencias
+// generadas. No se permiten sugerencias duplicadas.
 typedef struct {
   char** datos;
   int nElems;
   int tamano;
-} Arreglo;
+} Sugerencias;
 
-// TODO: documentar
-Arreglo* arreglo_crear(int tamano);
+// sugerencias_crear: int -> Sugerencias*
+// Recibe un entero que representa la cantidad máxima de sugerencias a
+// almacenar,
+// Devuelve una puntero a nueva estructura Sugerencias con dicho tamaño.
+Sugerencias* sugerencias_crear(int tamano);
 
-// TODO: documentar
-int arreglo_anadir(Arreglo* arreglo, char* palabra);
+// sugerencias_añadir: Sugerencias* char* -> int
+// Recibe un puntero a una estructura Sugerencias y una palabra,
+// Trata de añadir la palabra, si ya fue añadida previamente, devuelve 0.
+// Si no, la añade y devuelve 1.
+int sugerencias_anadir(Sugerencias* sugerencias, char* palabra);
 
-// TODO: documentar
-void arreglo_destruir(Arreglo* arreglo);
+// sugerencias_destruir: Sugerencias* -> void
+// Recibe un puntero a una estructura Sugerencias,
+// La destruye.
+void sugerencias_destruir(Sugerencias* sugerencias);
 
-// TODO: docuentar
-int arreglo_lleno(Arreglo* arreglo);
+// sugerencias_lleno: Sugerencias* -> int
+// Recibe una estructura Sugerencias,
+// Devuelve 1 si esta lleno o 0 en el caso contrario
+int sugerencias_lleno(Sugerencias* sugerencias);
 
 // Definimos la siguiente estructura Caracter para usar en una SPila de
 // caracteres.
@@ -93,10 +93,12 @@ Caracter* caracter_crear(char c);
 
 #define TAMANO_ALFABETO 33
 
-// TODO: fix
-// caracter_a_indice: char -> int
-// Recibe un caracter,
-// Devuelve el entero que se le asigna según la representación de caracteres.
+// caracter_a_indice: char int -> int
+// Recibe un caracter y un flag permitirCaracteresEspeciales,
+// Si permitirCaracteresEspeciales es 1, devuelve el entero que se le asigna
+// según la representación de caracteres.
+// Si es 0, devuelve el entero que corresponde sólo si no es un caracter
+// especial.
 // - Nota: por la manera en que se representan algunos caracteres especiales,
 //   tenemos en cuenta que al recibirlo primero recibimos un char == -61 y luego
 //   otro, pero son los dos en conjunto quienes forman el caracter especial. Por
@@ -121,8 +123,19 @@ int caracter_a_indice(char caracter, int permitirCaracteresEspeciales);
 //   ser representado correctamente.
 char indice_a_caracter(int indice);
 
+// swap: char* int int -> void
+// Recibe una palabra y dos índices,
+// Intercambia los caracteres en las posiciones de dichos índices.
 void swap(char* palabra, int i, int j);
 
+// transponer_adyacentes: char* int -> void
+// Recibe una palabra y un índice, transpone la letra en el índice i-ésimo de
+// la palabra y la siguiente.
+// - Nota: tenemos en cuenta que los caracteres especiales están representados
+//   por 2 caracteres, por lo que si se tiene palabra == ñoño, i == 0, se
+//   intercambian los 2 caracteres correspondientes a la ñ con la o como se
+//   esperaría. Se realizan consideraciones similares cuando la siguiente letra
+//   es un caracter especial.
 void transponer_adyacentes(char* palabra, int i);
 
 #endif  // __UTIL_H_
